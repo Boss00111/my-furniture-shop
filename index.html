@@ -1,53 +1,57 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comfort Shop</title>
+    <title>Comfort Shop | Меблі</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { font-family: sans-serif; background-color: #f4f4f4; margin: 0; padding: 15px; color: #333; }
         .item { background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .item img { width: 100%; border-radius: 8px; }
+        h1 { font-size: 22px; text-align: center; }
         h2 { font-size: 18px; margin: 10px 0; }
-        .price { color: #2ecc71; font-weight: bold; font-size: 20px; }
+        .price { color: #2ecc71; font-weight: bold; font-size: 20px; margin-bottom: 10px; }
         button { 
             width: 100%; background: #3498db; color: white; border: none; 
-            padding: 10px; border-radius: 8px; margin-top: 10px; cursor: pointer; font-size: 16px;
+            padding: 12px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;
         }
         button:active { background: #2980b9; }
+        .close-btn { background: #e74c3c; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <h1>Каталог мебели</h1>
+    <h1>Каталог меблів</h1>
     
     <div class="item">
-        <img src="https://via.placeholder.com/300x200?text=Bean+Bag" alt="Кресло-мешок">
-        <h2>Кресло-мешок "Груша" XL</h2>
-        <p>Ткань: Оксфорд. Цвет: Графит.</p>
+        <img src="https://via.placeholder.com/300x200?text=Bean+Bag" alt="Крісло-мішок">
+        <h2>Крісло-мішок "Груша" XL</h2>
+        <p>Тканина: Оксфорд. Колір: Графіт.</p>
         <div class="price">1200 грн</div>
-        <button onclick="sendData('Кресло-мешок Груша XL', 1200)">Заказать</button>
+        <button onclick="sendData('Крісло-мішок Груша XL', 1200)">Замовити</button>
     </div>
 
     <div class="item">
         <img src="https://via.placeholder.com/300x200?text=Futon" alt="Футон">
         <h2>Футон Комфорт</h2>
-        <p>Размер: 160x200. Наполнитель: ППУ.</p>
-        <div class="price:">3500 грн</div>
-        <button onclick="sendData('Футон Комфорт', 3500)">Заказать</button>
+        <p>Розмір: 160x200. Наповнювач: ППУ.</p>
+        <div class="price">3500 грн</div>
+        <button onclick="sendData('Футон Комфорт', 3500)">Замовити</button>
     </div>
+
+    <button class="close-btn" onclick="tg.close()">Повернутися до чату</button>
 
     <script>
         let tg = window.Telegram.WebApp;
-        tg.expand(); // Раскрыть на весь экран
+        tg.expand(); 
 
         function sendData(name, price) {
             let data = {
                 item: name,
                 price: price
             };
-            tg.sendData(JSON.stringify(data)); // Отправляем данные боту
-            tg.close(); // Закрываем магазин
+            tg.sendData(JSON.stringify(data)); 
+            tg.close(); 
         }
     </script>
 </body>

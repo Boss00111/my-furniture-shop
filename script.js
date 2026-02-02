@@ -1,65 +1,64 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// База товарів з урахуванням твоїх категорій
+// Словник кольорів Oxford
+const oxfordColors = {
+    "№1 Білий": "#ffffff", "№2 Бежевий": "#f5f5dc", "№3 Жовтий": "#ffff00",
+    "№4 Помаранчевий": "#ffa500", "№5 Червоний": "#ff0000", "№6 Рожевий": "#ffc0cb",
+    "№7 Бордо": "#800000", "№8 Салатовий": "#7fff00", "№9 Зелений": "#008000",
+    "№10 Т.-зелений": "#006400", "№11 Блакитний": "#87ceeb", "№12 Синій": "#0000ff",
+    "№13 Т.-синій": "#00008b", "№14 Фіолетовий": "#800080", "№15 С.-сірий": "#d3d3d3",
+    "№16 Т.-сірий": "#a9a9a9", "№17 Коричневий": "#a52a2a", "№18 Чорний": "#000000",
+    "№19 Бірюзовий": "#40e0d0", "№20 Малиновий": "#dc143c", "№21 Хакі": "#bdb76b",
+    "№22 Оливковий": "#808000", "№23 Кораловий": "#ff7f50", "№24 Т. м’ята": "#3eb489",
+    "№25 Шоколад": "#4b3621", "№26 Графіт": "#383e42"
+};
+
 const products = [
     {
         id: 'beanbag',
-        name: 'Крісло-груша',
-        basePrice: 850, 
+        name: 'Крісла (Груші / Овали)',
+        image: 'grusha.jpg', // Завантаж файл з такою назвою на GitHub
+        types: { 'Груша': 0, 'Овал': 80 },
         sizes: {
-            'L (65*85)': 0,
-            'XL (85*105)': 250,
-            '2XL (90*125)': 450,
-            '3XL (100*135)': 650,
-            '4XL (110*145)': 900
+            'L (65*85)': 1100, 'XL (85*105)': 1280, '2XL (90*130)': 1460,
+            '3XL (100*140)': 1620, '4XL (110*150)': 2000
         },
-        fabrics: {
-            'Оксфорд 600D': 0,
-            'Велюр': 550,
-            'Екошкіра': 450
-        },
-        colors: [
-            '№1 Білий', '№2 Бежевий', '№3 Жовтий', '№4 Помаранчевий', 
-            '№5 Червоний', '№6 Рожевий', '№7 Бордо', '№8 Салатовий', 
-            '№9 Зелений', '№10 Т.-зелений', '№11 Блакитний', '№12 Синій', 
-            '№13 Т.-синій', '№14 Фіолетовий', '№15 С.-сірий', 
-            '№16 Т.-сірий', '№17 Коричневий', '№18 Чорний', '№19 Бірюзовий',
-            '№20 Малиновий', '№21 Хакі', '№22 Оливковий', '№23 Кораловий',
-            '№24 Т. м’ята', '№25 Шоколад', '№26 Графіт'
-        ],
-        hasInnerCase: true
+        fabrics: { 'Оксфорд 600D': 0, 'Велюр': 500, 'Екошкіра': 400 },
+        hasInnerCase: true,
+        casePrice: 190
     },
     {
         id: 'swing',
-        name: 'Гойдалка підвісна',
-        basePrice: 1450,
-        sizes: {
-            'Одинарна': 0,
-            'Подвійна (сімейна)': 950
+        name: 'Підвісні гойдалки',
+        image: 'swing.jpg',
+        types: { 
+            'Одномісна (95см) + Пряма подушка': 1643,
+            'Одномісна (95см) + Кругла подушка': 2015,
+            'Двомісна (120х80)': 3360,
+            'Двомісна (150х80)': 3700,
+            'Двомісна (180х90)': 4140,
+            'Двомісна (195х110)': 4560
         },
-        fabrics: {
-            'Оксфорд (вулична)': 0,
-            'Велюр (домашня)': 450
-        },
-        colors: ['Бежевий', 'Сірий', 'Графіт', 'Коричневий', 'Зелений'],
-        hasInnerCase: false
+        options: { 'Стандарт': 0, 'Розбірна (+200грн)': 200 }
     },
     {
         id: 'futon',
-        name: 'Футон (Матрац)',
-        basePrice: 1600,
-        sizes: {
-            'Стандарт (70*190)': 0,
-            'Комфорт (90*200)': 500,
-            'Люкс (140*200)': 1200
+        name: 'Футони',
+        image: 'futon.jpg',
+        sizes: { '160х80': 1730, '180х90': 1880 },
+        options: { 'Без посилення': 0, 'Посилення форми (+190грн)': 190 }
+    },
+    {
+        id: 'ball',
+        name: 'Крісло-М’яч',
+        image: 'ball.jpg',
+        sizes: { 
+            'L (50см)': 810, 'XL (70см)': 1200, 
+            '2XL (100см)': 1700, '3XL (130см)': 2025 
         },
-        fabrics: {
-            'Рогожка': 0,
-            'Велюр': 450
-        },
-        colors: ['Сірий', 'Синій', 'Бежевий', 'Коричневий'],
-        hasInnerCase: false
+        fabrics: { 'Оксфорд': 0 },
+        isBall: true // Для вибору кольору основи та вставок
     }
 ];
 
@@ -69,93 +68,94 @@ function renderCatalog() {
     const catalog = document.getElementById('catalog');
     catalog.innerHTML = '';
 
-    products.forEach(product => {
+    products.forEach(p => {
         const card = document.createElement('div');
         card.className = 'product-card';
-        card.innerHTML = `
-            <div class="product-title">${product.name}</div>
-            
-            <label>Розмір:</label>
-            <select id="size-${product.id}" onchange="updatePrice('${product.id}')">
-                ${Object.keys(product.sizes).map(s => `<option value="${s}">${s}</option>`).join('')}
-            </select>
+        
+        let html = `<img src="${p.image}" style="width:100%; border-radius:8px; margin-bottom:10px;" alt="${p.name}">
+                    <div class="product-title">${p.name}</div>`;
 
-            <label>Тканина:</label>
-            <select id="fabric-${product.id}" onchange="updatePrice('${product.id}')">
-                ${Object.keys(product.fabrics).map(f => `<option value="${f}">${f}</option>`).join('')}
-            </select>
+        // Вибір типу (для груш/овалів або гойдалок)
+        if (p.types) {
+            html += `<label>Модель:</label><select id="type-${p.id}" onchange="updatePrice('${p.id}')">
+                     ${Object.keys(p.types).map(t => `<option value="${t}">${t}</option>`).join('')}</select>`;
+        }
 
-            <label>Колір:</label>
-            <select id="color-${product.id}">
-                ${product.colors.map(c => `<option value="${c}">${c}</option>`).join('')}
-            </select>
+        // Вибір розміру
+        if (p.sizes) {
+            html += `<label>Розмір:</label><select id="size-${p.id}" onchange="updatePrice('${p.id}')">
+                     ${Object.keys(p.sizes).map(s => `<option value="${s}">${s}</option>`).join('')}</select>`;
+        }
 
-            ${product.hasInnerCase ? `
-                <div class="checkbox-group">
-                    <input type="checkbox" id="case-${product.id}" onchange="updatePrice('${product.id}')"> 
-                    <label for="case-${product.id}">Додати внутрішній чохол (+160 грн)</label>
-                </div>
-            ` : ''}
+        // Кольори (якщо М'яч - два вибори)
+        if (p.isBall) {
+            html += `<label>Колір основи:</label>${renderColorSelect(`color1-${p.id}`)}
+                     <label>Колір вставок:</label>${renderColorSelect(`color2-${p.id}`)}`;
+        } else {
+            html += `<label>Колір:</label>${renderColorSelect(`color-${p.id}`)}`;
+        }
 
-            <div class="price-tag"><span id="price-val-${product.id}">${product.basePrice}</span> грн</div>
-            
-            <button class="btn" onclick="addToCart('${product.id}')">В кошик</button>
-            <button class="btn btn-support" onclick="askQuestion('${product.name}')" style="background-color: #abb7b7; margin-top: 8px;">Задати питання</button>
-        `;
+        // Чохол або Опції
+        if (p.hasInnerCase) {
+            html += `<div class="checkbox-group"><input type="checkbox" id="case-${p.id}" onchange="updatePrice('${p.id}')"> Додати внутр. чохол (+${p.casePrice} грн)</div>`;
+        }
+        if (p.options) {
+            html += `<label>Додатково:</label><select id="opt-${p.id}" onchange="updatePrice('${p.id}')">
+                     ${Object.keys(p.options).map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
+        }
+
+        html += `<div class="price-tag"><span id="price-val-${p.id}">0</span> грн</div>
+                 <button class="btn" onclick="addToCart('${p.id}')">В кошик</button>`;
+        
+        card.innerHTML = html;
         catalog.appendChild(card);
-        updatePrice(product.id);
+        updatePrice(p.id);
     });
 }
 
-function updatePrice(productId) {
-    const product = products.find(p => p.id === productId);
-    const size = document.getElementById(`size-${productId}`).value;
-    const fabric = document.getElementById(`fabric-${productId}`).value;
-    const hasCase = document.getElementById(`case-${productId}`)?.checked;
-
-    let total = product.basePrice + product.sizes[size] + product.fabrics[fabric];
-    if (hasCase) total += 160;
-
-    document.getElementById(`price-val-${productId}`).innerText = total;
+function renderColorSelect(id) {
+    return `<select id="${id}" style="border-left: 10px solid #ccc;" onchange="this.style.borderLeftColor=this.options[this.selectedIndex].dataset.color">
+            ${Object.entries(oxfordColors).map(([name, hex]) => 
+                `<option value="${name}" data-color="${hex}">${name}</option>`).join('')}
+            </select>`;
 }
 
-function addToCart(productId) {
-    const product = products.find(p => p.id === productId);
-    const size = document.getElementById(`size-${productId}`).value;
-    const fabric = document.getElementById(`fabric-${productId}`).value;
-    const color = document.getElementById(`color-${productId}`).value;
-    const price = parseInt(document.getElementById(`price-val-${productId}`).innerText);
+function updatePrice(id) {
+    const p = products.find(prod => prod.id === id);
+    let total = 0;
 
-    cart.push({
-        name: `${product.name} (${size}, ${fabric}, ${color})`,
-        price: price
-    });
+    if (p.sizes) total += p.sizes[document.getElementById(`size-${id}`).value];
+    if (p.types) total += p.types[document.getElementById(`type-${id}`).value];
+    if (p.hasInnerCase && document.getElementById(`case-${id}`).checked) total += p.casePrice;
+    if (p.options) total += p.options[document.getElementById(`opt-${id}`).value];
 
+    document.getElementById(`price-val-${id}`).innerText = total;
+}
+
+function addToCart(id) {
+    const p = products.find(prod => prod.id === id);
+    const price = document.getElementById(`price-val-${id}`).innerText;
+    const type = p.types ? document.getElementById(`type-${id}`).value : '';
+    const size = p.sizes ? document.getElementById(`size-${id}`).value : '';
+    
+    let desc = `${p.name} ${type} ${size}`;
+    cart.push({ name: desc, price: parseInt(price) });
     updateCartUI();
 }
 
 function updateCartUI() {
     const total = cart.reduce((sum, item) => sum + item.price, 0);
-    const cartBar = document.getElementById('cart-bar');
-    if (cart.length > 0) {
-        cartBar.style.display = 'block';
-        document.getElementById('total-price').innerText = total;
-    }
-}
-
-function askQuestion(productName) {
-    tg.sendData(JSON.stringify({ action: 'question', item: productName }));
-    tg.close();
+    document.getElementById('cart-bar').style.display = 'block';
+    document.getElementById('total-price').innerText = total;
 }
 
 function sendOrder() {
-    const total = cart.reduce((sum, item) => sum + item.price, 0);
-    const orderData = {
+    const total = document.getElementById('total-price').innerText;
+    tg.sendData(JSON.stringify({
         action: 'order',
         items: cart.map(i => i.name).join(', '),
         totalPrice: total
-    };
-    tg.sendData(JSON.stringify(orderData));
+    }));
     tg.close();
 }
 

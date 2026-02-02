@@ -1,44 +1,53 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// Словник кольорів Oxford
+// Оновлена палітра Oxford згідно з твоїм списком
 const oxfordColors = {
-    "№1 Білий": "#ffffff", "№2 Бежевий": "#f5f5dc", "№3 Жовтий": "#ffff00",
-    "№4 Помаранчевий": "#ffa500", "№5 Червоний": "#ff0000", "№6 Рожевий": "#ffc0cb",
-    "№7 Бордо": "#800000", "№8 Салатовий": "#7fff00", "№9 Зелений": "#008000",
-    "№10 Т.-зелений": "#006400", "№11 Блакитний": "#87ceeb", "№12 Синій": "#0000ff",
-    "№13 Т.-синій": "#00008b", "№14 Фіолетовий": "#800080", "№15 С.-сірий": "#d3d3d3",
-    "№16 Т.-сірий": "#a9a9a9", "№17 Коричневий": "#a52a2a", "№18 Чорний": "#000000",
-    "№19 Бірюзовий": "#40e0d0", "№20 Малиновий": "#dc143c", "№21 Хакі": "#bdb76b",
-    "№22 Оливковий": "#808000", "№23 Кораловий": "#ff7f50", "№24 Т. м’ята": "#3eb489",
-    "№25 Шоколад": "#4b3621", "№26 Графіт": "#383e42"
+    "2 - Коричневий": "#4b3621", "3 - Какао": "#8b5a2b", "4 - Бежевий": "#f5f5dc",
+    "4/1 - Пісочно-сірий": "#c2b2a3", "4/2 - Пудровий": "#e1c4c4", "5 - Електрик": "#0000ff",
+    "6 - Трава": "#4caf50", "7 - Малина": "#e91e63", "8 - Темно-синій": "#000080",
+    "9 - Блакитний": "#87ceeb", "10 - Фіолетовий": "#800080", "11 - М'ята": "#3eb489",
+    "12 - Червоний": "#ff0000", "13 - Гірчичний": "#e1ad01", "14 - Жовтий": "#ffff00",
+    "14/1 - Жовтогарячий": "#ff8c00", "15 - Сірий": "#808080", "17 - Темно-сірий": "#4f4f4f",
+    "18 - Вино": "#722f37", "20 - Білий": "#ffffff", "21 - Рожевий пиловий": "#dcaebb",
+    "22 - Оранжевий": "#ffa500", "26 - Салат": "#7fff00", "27 - Бузок": "#c8a2c8",
+    "28 - Темно-зелений": "#006400", "29 - Хакі": "#4b5320", "30 - Чорний": "#000000",
+    "32 - Рожевий (Барбі)": "#da1884"
 };
+
+const ecoColors = { "ЕК3 Чорний": "#000000", "ЕК19 Білий": "#ffffff" };
 
 const products = [
     {
         id: 'beanbag',
         name: 'Крісла (Груші / Овали)',
-        image: 'grusha.jpg', // Завантаж файл з такою назвою на GitHub
+        image: 'grusha.jpg',
         types: { 'Груша': 0, 'Овал': 80 },
         sizes: {
             'L (65*85)': 1100, 'XL (85*105)': 1280, '2XL (90*130)': 1460,
             '3XL (100*140)': 1620, '4XL (110*150)': 2000
         },
-        fabrics: { 'Оксфорд 600D': 0, 'Велюр': 500, 'Екошкіра': 400 },
+        fabrics: { 'Оксфорд 600D': 0, 'Велюр': 550, 'Екошкіра': 450 },
         hasInnerCase: true,
-        casePrice: 190
+        casePrice: 190,
+        allowCombine: true
+    },
+    {
+        id: 'ball',
+        name: 'Крісло-М’яч',
+        image: 'ball.jpg',
+        sizes: { 'L (50см)': 810, 'XL (70см)': 1200, '2XL (100см)': 1700, '3XL (130см)': 2025 },
+        fabrics: { 'Оксфорд': 0 },
+        isBall: true 
     },
     {
         id: 'swing',
         name: 'Підвісні гойдалки',
         image: 'swing.jpg',
         types: { 
-            'Одномісна (95см) + Пряма подушка': 1643,
-            'Одномісна (95см) + Кругла подушка': 2015,
-            'Двомісна (120х80)': 3360,
-            'Двомісна (150х80)': 3700,
-            'Двомісна (180х90)': 4140,
-            'Двомісна (195х110)': 4560
+            'Одинарна (95см) + Пряма': 1643, 'Одинарна (95см) + Кругла': 2015,
+            'Двомісна (120х80)': 3360, 'Двомісна (150х80)': 3700,
+            'Двомісна (180х90)': 4140, 'Двомісна (195х110)': 4560
         },
         options: { 'Стандарт': 0, 'Розбірна (+200грн)': 200 }
     },
@@ -48,17 +57,6 @@ const products = [
         image: 'futon.jpg',
         sizes: { '160х80': 1730, '180х90': 1880 },
         options: { 'Без посилення': 0, 'Посилення форми (+190грн)': 190 }
-    },
-    {
-        id: 'ball',
-        name: 'Крісло-М’яч',
-        image: 'ball.jpg',
-        sizes: { 
-            'L (50см)': 810, 'XL (70см)': 1200, 
-            '2XL (100см)': 1700, '3XL (130см)': 2025 
-        },
-        fabrics: { 'Оксфорд': 0 },
-        isBall: true // Для вибору кольору основи та вставок
     }
 ];
 
@@ -72,33 +70,42 @@ function renderCatalog() {
         const card = document.createElement('div');
         card.className = 'product-card';
         
-        let html = `<img src="${p.image}" style="width:100%; border-radius:8px; margin-bottom:10px;" alt="${p.name}">
+        let html = `<img src="${p.image}" style="width:100%; border-radius:12px; margin-bottom:10px;">
                     <div class="product-title">${p.name}</div>`;
 
-        // Вибір типу (для груш/овалів або гойдалок)
         if (p.types) {
             html += `<label>Модель:</label><select id="type-${p.id}" onchange="updatePrice('${p.id}')">
                      ${Object.keys(p.types).map(t => `<option value="${t}">${t}</option>`).join('')}</select>`;
         }
 
-        // Вибір розміру
         if (p.sizes) {
             html += `<label>Розмір:</label><select id="size-${p.id}" onchange="updatePrice('${p.id}')">
                      ${Object.keys(p.sizes).map(s => `<option value="${s}">${s}</option>`).join('')}</select>`;
         }
 
-        // Кольори (якщо М'яч - два вибори)
-        if (p.isBall) {
-            html += `<label>Колір основи:</label>${renderColorSelect(`color1-${p.id}`)}
-                     <label>Колір вставок:</label>${renderColorSelect(`color2-${p.id}`)}`;
-        } else {
-            html += `<label>Колір:</label>${renderColorSelect(`color-${p.id}`)}`;
+        if (p.fabrics) {
+            html += `<label>Тканина:</label><select id="fabric-${p.id}" onchange="updateFabric('${p.id}')">
+                     ${Object.keys(p.fabrics).map(f => `<option value="${f}">${f}</option>`).join('')}</select>`;
         }
 
-        // Чохол або Опції
-        if (p.hasInnerCase) {
-            html += `<div class="checkbox-group"><input type="checkbox" id="case-${p.id}" onchange="updatePrice('${p.id}')"> Додати внутр. чохол (+${p.casePrice} грн)</div>`;
+        // Блок вибору кольору
+        html += `<div id="color-section-${p.id}">`;
+        if (p.isBall) {
+            html += `<label>Колір основи:</label>${renderColorSelect(`color1-${p.id}`, oxfordColors)}
+                     <label>Колір вставок:</label>${renderColorSelect(`color2-${p.id}`, oxfordColors)}`;
+        } else {
+            html += `<label>Колір:</label>${renderColorSelect(`color-${p.id}`, oxfordColors)}`;
+            if (p.allowCombine) {
+                html += `<div class="checkbox-group"><input type="checkbox" id="combine-${p.id}" onchange="toggleCombine('${p.id}')"> Комбінований (4+2)</div>
+                         <div id="extra-color-${p.id}" style="display:none;"><label>Другий колір:</label>${renderColorSelect(`color2-${p.id}`, oxfordColors)}</div>`;
+            }
         }
+        html += `</div>`;
+
+        if (p.hasInnerCase) {
+            html += `<div class="checkbox-group"><input type="checkbox" id="case-${p.id}" onchange="updatePrice('${p.id}')"> Внутрішній чохол (+${p.casePrice} грн)</div>`;
+        }
+        
         if (p.options) {
             html += `<label>Додатково:</label><select id="opt-${p.id}" onchange="updatePrice('${p.id}')">
                      ${Object.keys(p.options).map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
@@ -113,32 +120,60 @@ function renderCatalog() {
     });
 }
 
-function renderColorSelect(id) {
-    return `<select id="${id}" style="border-left: 10px solid #ccc;" onchange="this.style.borderLeftColor=this.options[this.selectedIndex].dataset.color">
-            ${Object.entries(oxfordColors).map(([name, hex]) => 
+function renderColorSelect(id, palette) {
+    const firstHex = Object.values(palette)[0];
+    return `<select id="${id}" style="border-left: 15px solid ${firstHex}; padding-left: 10px;" onchange="this.style.borderLeftColor=this.options[this.selectedIndex].dataset.color">
+            ${Object.entries(palette).map(([name, hex]) => 
                 `<option value="${name}" data-color="${hex}">${name}</option>`).join('')}
             </select>`;
+}
+
+function updateFabric(id) {
+    const fabric = document.getElementById(`fabric-${id}`).value;
+    const colorSection = document.getElementById(`color-section-${id}`);
+    const p = products.find(prod => prod.id === id);
+
+    let palette = oxfordColors;
+    if (fabric === 'Екошкіра') palette = ecoColors;
+    // Велюр кольори додамо пізніше, поки Оксфорд
+    
+    colorSection.innerHTML = `<label>Колір:</label>${renderColorSelect(`color-${id}`, palette)}`;
+    if (p.allowCombine) {
+        colorSection.innerHTML += `<div class="checkbox-group"><input type="checkbox" id="combine-${id}" onchange="toggleCombine('${id}')"> Комбінований (4+2)</div>
+                                  <div id="extra-color-${id}" style="display:none;"><label>Другий колір:</label>${renderColorSelect(`color2-${id}`, palette)}</div>`;
+    }
+    updatePrice(id);
+}
+
+function toggleCombine(id) {
+    const checked = document.getElementById(`combine-${id}`).checked;
+    document.getElementById(`extra-color-${id}`).style.display = checked ? 'block' : 'none';
 }
 
 function updatePrice(id) {
     const p = products.find(prod => prod.id === id);
     let total = 0;
-
     if (p.sizes) total += p.sizes[document.getElementById(`size-${id}`).value];
     if (p.types) total += p.types[document.getElementById(`type-${id}`).value];
+    if (p.fabrics) total += p.fabrics[document.getElementById(`fabric-${id}`).value];
     if (p.hasInnerCase && document.getElementById(`case-${id}`).checked) total += p.casePrice;
     if (p.options) total += p.options[document.getElementById(`opt-${id}`).value];
-
     document.getElementById(`price-val-${id}`).innerText = total;
 }
 
 function addToCart(id) {
     const p = products.find(prod => prod.id === id);
     const price = document.getElementById(`price-val-${id}`).innerText;
-    const type = p.types ? document.getElementById(`type-${id}`).value : '';
     const size = p.sizes ? document.getElementById(`size-${id}`).value : '';
+    const fabric = p.fabrics ? document.getElementById(`fabric-${id}`).value : '';
+    const color = document.getElementById(`color-${id}`)?.value || document.getElementById(`color1-${id}`).value;
     
-    let desc = `${p.name} ${type} ${size}`;
+    let desc = `${p.name} ${size} ${fabric} Колір: ${color}`;
+    if (document.getElementById(`combine-${id}`)?.checked || p.isBall) {
+        const color2 = document.getElementById(`color2-${id}`).value;
+        desc += ` + ${color2}`;
+    }
+
     cart.push({ name: desc, price: parseInt(price) });
     updateCartUI();
 }
@@ -151,11 +186,7 @@ function updateCartUI() {
 
 function sendOrder() {
     const total = document.getElementById('total-price').innerText;
-    tg.sendData(JSON.stringify({
-        action: 'order',
-        items: cart.map(i => i.name).join(', '),
-        totalPrice: total
-    }));
+    tg.sendData(JSON.stringify({ action: 'order', items: cart.map(i => i.name).join(', '), totalPrice: total }));
     tg.close();
 }
 

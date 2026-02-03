@@ -6,220 +6,54 @@
     <title>Comfort and Furniture</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --primary-color: #007bff;
-            --bg-color: #f4f7f9;
-            --card-bg: #ffffff;
-            --text-color: #333;
-        }
+        :root { --primary-color: #007bff; --bg-color: #f4f7f9; --card-bg: #ffffff; }
+        body { font-family: sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; padding-bottom: 80px; }
+        #catalog { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .product-card { background: var(--card-bg); border-radius: 15px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .product-card img { width: 100%; border-radius: 12px; }
+        .product-title { font-weight: bold; font-size: 18px; margin: 10px 0; }
+        label { display: block; font-size: 13px; margin-top: 10px; color: #666; }
+        select, .qty-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-top: 5px; }
+        .qty-container { display: flex; align-items: center; gap: 10px; margin: 15px 0; }
+        .qty-input { width: 80px; text-align: center; }
+        .price-tag { font-size: 20px; font-weight: bold; color: var(--primary-color); margin: 10px 0; }
+        .btn { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 10px;
-            padding-bottom: 120px; /* Місце для закріпленого кошика */
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 22px;
-            color: #222;
-        }
-
-        #catalog {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .product-card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
-        .product-card img {
-            width: 100%;
-            height: auto;
-            border-radius: 12px;
-            margin-bottom: 10px;
-        }
-
-        .product-title {
-            font-weight: bold;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            margin-top: 10px;
-            margin-bottom: 4px;
-            color: #666;
-        }
-
-        select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            font-size: 15px;
-            outline: none;
-            background-color: #fff;
-        }
-
-        /* Кольорові опції */
-        .color-select option {
-            padding: 10px;
-            font-weight: bold;
-        }
-
-        .checkbox-group {
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .checkbox-group input {
-            margin-right: 10px;
-            width: 18px;
-            height: 18px;
-        }
-
-        .price-tag {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin: 15px 0;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .btn:active {
-            opacity: 0.8;
-        }
-
-        .btn-outline {
-            background: none;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            margin-top: 8px;
-        }
-
-        /* Стилі кошика */
-        #cart-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #ffffff;
-            padding: 15px;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            z-index: 1000;
-        }
-
-        #cart-items {
-            max-height: 120px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-        }
-
-        .remove-item {
-            color: #ff4d4d;
-            font-weight: bold;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .cart-summary {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .qty-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 15px 0;
-}
-.qty-input {
-    width: 60px;
-    padding: 8px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    text-align: center;
-    font-size: 16px;
-    font-weight: bold;
-}
-.cart-item-info {
-    display: flex;
-    flex-direction: column;
-}
-.cart-item-qty {
-    font-size: 12px;
-    color: #666;
-}
-
+        /* КОМПАКТНИЙ КОШИК */
+        #cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 10px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); z-index: 1000; border-top-left-radius: 20px; border-top-right-radius: 20px; }
+        #cart-details { display: none; margin-bottom: 10px; max-height: 200px; overflow-y: auto; border-bottom: 1px solid #eee; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-size: 14px; border-bottom: 1px solid #f9f9f9; }
+        .remove-item { color: red; font-weight: bold; padding: 5px; cursor: pointer; }
+        .cart-main-info { display: flex; justify-content: space-between; align-items: center; }
+        .toggle-cart-btn { background: #eee; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <h1>🛍 Comfort and Furniture</h1>
-    
-    <div id="catalog">
-        </div>
+    <div id="catalog"></div>
 
     <div id="cart-bar" style="display: none;">
-        <div id="cart-items"></div>
-        <div class="cart-summary">
-            <span>Всього:</span>
-            <span><span id="total-price">0</span> грн</span>
+        <div id="cart-details"></div> <div class="cart-main_info">
+            <div>
+                <button class="toggle-cart-btn" onclick="toggleCart()">🛒 Подивитись кошик</button>
+                <div style="font-weight: bold; margin-top: 5px;">Всього: <span id="total-price">0</span> грн</div>
+            </div>
+            <button class="btn" style="width: 40%;" onclick="sendOrder()">Оформити</button>
         </div>
-        <button class="btn" onclick="sendOrder()">Оформити замовлення</button>
     </div>
 
     <script src="script.js"></script>
     <script>
-        // Додаткова логіка для кнопок "Запитати" (якщо вони будуть всередині карток)
-        function askQuestion(productName) {
-            tg.sendData(JSON.stringify({
-                action: 'question',
-                item: productName
-            }));
-            tg.close();
+        function toggleCart() {
+            const details = document.getElementById('cart-details');
+            const btn = document.querySelector('.toggle-cart-btn');
+            if (details.style.display === 'block') {
+                details.style.display = 'none';
+                btn.innerText = '🛒 Подивитись кошик';
+            } else {
+                details.style.display = 'block';
+                btn.innerText = '❌ Згорнути';
+            }
         }
     </script>
 </body>

@@ -81,14 +81,15 @@
     <div id="catalog"></div>
 
     <div id="cart-bar" style="display: none;">
-        <div id="cart-details"></div> <div class="cart-main_info">
-            <div>
-                <button class="toggle-cart-btn" onclick="toggleCart()">🛒 Подивитись кошик</button>
-                <div style="font-weight: bold; margin-top: 5px;">Всього: <span id="total-price">0</span> грн</div>
-            </div>
-            <button class="btn" style="width: 40%;" onclick="sendOrder()">Оформити</button>
+    <div id="cart-details"></div> <div class="cart-main-info">
+        <div class="cart-left-side">
+            <button class="toggle-cart-btn" onclick="toggleCart()">🛒 Подивитись кошик</button>
+            <div class="total-sum-box"><span id="total-price">0</span> грн</div>
         </div>
+        
+        <button class="order-btn" onclick="sendOrder()">Оформити</button>
     </div>
+</div>
 
     <script src="script.js"></script>
     <script>
@@ -106,4 +107,5 @@
     </script>
 </body>
 </html>
+
 

@@ -31,9 +31,8 @@ const products = [
         name: 'Крісло-М’яч',
         image: 'ball.jpg',
         sizes: { 'L (50см)': 810, 'XL (70см)': 1200, '2XL (100см)': 1700, '3XL (130см)': 2025 },
-        fabrics: { 'Оксфорд': 0 },
         isBall: true,
-        hasInnerCase: true, // Додано внутрішній чохол для м'ячів
+        hasInnerCase: true,
         casePrice: 190
     },
     {
@@ -41,7 +40,7 @@ const products = [
         name: 'Підвісні гойдалки',
         image: 'swing.jpg',
         types: { 'Одинарна (95см) + Пряма': 1643, 'Одинарна (95см) + Кругла': 2015, 'Двомісна (120х80)': 3360, 'Двомісна (150х80)': 3700 },
-        options: { 'Стандарт': 0, 'Розбірна (+480грн)': 480 } // Оновлено ціну на 480
+        options: { 'Стандарт': 0, 'Розбірна (+480грн)': 480 }
     }
 ];
 
@@ -61,8 +60,11 @@ function renderCatalog() {
         html += `<label>Колір:</label>${renderColorSelect(p.isBall ? `color1-${p.id}` : `color-${p.id}`, oxfordColors)}`;
         if (p.isBall) html += `<label>Колір 2:</label>${renderColorSelect(`color2-${p.id}`, oxfordColors)}`;
         
-        if (p.hasInnerCase) html += `<div class="checkbox-group"><input type="checkbox" id="case-${p.id}" onchange="updatePrice('${p.id}')"> Додати внутр. чохол (+${p.casePrice} грн)</div>`;
+        if (p.hasInnerCase) html += `<div class="checkbox-group"><input type="checkbox" id="case-${p.id}" onchange="updatePrice('${p.id}')"> Додати чохол (+190 грн)</div>`;
         if (p.options) html += `<label>Опції:</label><select id="opt-${p.id}" onchange="updatePrice('${p.id}')">${Object.keys(p.options).map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
+        
+        // Поле вибору кількості
+        html += `<div class="qty-container"><label style="margin:0">Кількість:</label><input type="number" id="qty-${p.id}" class="qty-input" value="1" min="1" onchange="updatePrice('${p.id}')"></div>`;
         
         html += `<div class="price-tag"><span id="price-val-${p.id}">0</span> грн</div><button class="btn" onclick="addToCart('${p.id}')">В кошик</button>`;
         card.innerHTML = html;
@@ -71,28 +73,32 @@ function renderCatalog() {
     });
 }
 
-// Функція для створення кольорового випадаючого списку
 function renderColorSelect(id, palette) {
-    return `<select id="${id}" class="color-select" onchange="this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor">
+    const firstHex = Object.values(palette)[0];
+    return `<select id="${id}" class="color-select" style="background-color: ${firstHex}; color: ${firstHex === '#ffffff' ? 'black' : 'white'};" onchange="const c=this.options[this.selectedIndex].dataset.color; this.style.backgroundColor=c; this.style.color=(c==='#ffffff'?'black':'white');">
         ${Object.entries(palette).map(([name, hex]) => 
-            `<option value="${name}" style="background-color: ${hex}; color: ${hex === '#ffffff' ? 'black' : 'white'};">${name}</option>`
+            `<option value="${name}" data-color="${hex}" style="background-color: ${hex}; color: ${hex === '#ffffff' ? 'black' : 'white'};">${name}</option>`
         ).join('')}
     </select>`;
 }
 
 function updatePrice(id) {
     const p = products.find(prod => prod.id === id);
-    let total = 0;
-    if (p.sizes) total += p.sizes[document.getElementById(`size-${id}`).value];
-    if (p.types) total += p.types[document.getElementById(`type-${id}`).value];
-    if (p.hasInnerCase && document.getElementById(`case-${id}`).checked) total += p.casePrice;
-    if (p.options) total += p.options[document.getElementById(`opt-${id}`).value];
-    document.getElementById(`price-val-${id}`).innerText = total;
+    let unitPrice = 0;
+    if (p.sizes) unitPrice += p.sizes[document.getElementById(`size-${id}`).value];
+    if (p.types) unitPrice += p.types[document.getElementById(`type-${id}`).value];
+    if (p.hasInnerCase && document.getElementById(`case-${id}`).checked) unitPrice += p.casePrice;
+    if (p.options) unitPrice += p.options[document.getElementById(`opt-${id}`).value];
+    
+    const qty = parseInt(document.getElementById(`qty-${id}`).value) || 1;
+    document.getElementById(`price-val-${id}`).innerText = unitPrice * qty;
 }
 
 function addToCart(id) {
     const p = products.find(prod => prod.id === id);
-    const price = document.getElementById(`price-val-${id}`).innerText;
+    const qty = parseInt(document.getElementById(`qty-${id}`).value) || 1;
+    const unitPrice = parseInt(document.getElementById(`price-val-${id}`).innerText) / qty;
+    
     const type = p.types ? document.getElementById(`type-${id}`).value : '';
     const size = p.sizes ? document.getElementById(`size-${id}`).value : '';
     const color = document.getElementById(`color-${id}`)?.value || document.getElementById(`color1-${id}`).value;
@@ -101,16 +107,25 @@ function addToCart(id) {
     if (p.isBall) desc += ` + ${document.getElementById(`color2-${id}`).value}`;
     if (p.hasInnerCase && document.getElementById(`case-${id}`).checked) desc += ` + Внутр. чохол`;
 
-    cart.push({ id: Date.now(), name: desc, price: parseInt(price) });
+    cart.push({ 
+        id: Date.now(), 
+        name: desc, 
+        qty: qty,
+        price: unitPrice * qty 
+    });
     updateCartUI();
+    document.getElementById(`qty-${id}`).value = 1; // Скидаємо лічильник після додавання
 }
 
 function updateCartUI() {
     const cartItems = document.getElementById('cart-items');
     cartItems.innerHTML = cart.map(item => `
         <div class="cart-item">
-            <span>${item.name} - ${item.price} грн</span>
-            <button onclick="removeFromCart(${item.id})" style="background:none; border:none; color:red; cursor:pointer; font-weight:bold;">❌</button>
+            <div class="cart-item-info">
+                <span>${item.name}</span>
+                <span class="cart-item-qty">Кількість: ${item.qty} шт. | ${item.price} грн</span>
+            </div>
+            <button onclick="removeFromCart(${item.id})" class="remove-item">❌</button>
         </div>
     `).join('');
     
@@ -126,7 +141,13 @@ function removeFromCart(uid) {
 
 function sendOrder() {
     if (cart.length === 0) return;
-    tg.sendData(JSON.stringify({ action: 'order', items: cart.map(i => i.name).join(', '), totalPrice: document.getElementById('total-price').innerText }));
+    // Формуємо текст для бота з урахуванням кількості
+    const itemsDesc = cart.map(i => `${i.name} (x${i.qty})`).join(', ');
+    tg.sendData(JSON.stringify({ 
+        action: 'order', 
+        items: itemsDesc, 
+        totalPrice: document.getElementById('total-price').innerText 
+    }));
     tg.close();
 }
 

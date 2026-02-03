@@ -8,7 +8,7 @@ const oxfordColors = {
     "9 - Блакитний": "#87ceeb", "10 - Фіолетовий": "#800080", "11 - М'ята": "#3eb489",
     "12 - Червоний": "#ff0000", "13 - Гірчичний": "#e1ad01", "14 - Жовтий": "#ffff00",
     "14/1 - Жовтогарячий": "#ff8c00", "15 - Сірий": "#808080", "17 - Темно-сірий": "#4f4f4f",
-    "18 - Вино": "#722f37", "20 - Білий": "#ffffff", "21 - Рожевий пиловий": "#dcaebb",
+    "18 - Вино": "#722f37", "20 - Біливй": "#ffffff", "21 - Рожевий пиловий": "#dcaebb",
     "22 - Оранжевий": "#ffa500", "26 - Салат": "#7fff00", "27 - Бузок": "#c8a2c8",
     "28 - Темно-зелений": "#006400", "29 - Хакі": "#4b5320", "30 - Чорний": "#000000",
     "32 - Рожевий (Барбі)": "#da1884"
@@ -52,7 +52,7 @@ function renderCatalog() {
     products.forEach(p => {
         const card = document.createElement('div');
         card.className = 'product-card';
-        let html = `<img src="${p.image}" style="width:100%; border-radius:12px;"><div class="product-title">${p.name}</div>`;
+        let html = `<img src="${p.image}" alt="${p.name}"><div class="product-title">${p.name}</div>`;
         
         if (p.types) html += `<label>Модель:</label><select id="type-${p.id}" onchange="updatePrice('${p.id}')">${Object.keys(p.types).map(t => `<option value="${t}">${t}</option>`).join('')}</select>`;
         if (p.sizes) html += `<label>Розмір:</label><select id="size-${p.id}" onchange="updatePrice('${p.id}')">${Object.keys(p.sizes).map(s => `<option value="${s}">${s}</option>`).join('')}</select>`;
@@ -60,10 +60,9 @@ function renderCatalog() {
         html += `<label>Колір:</label>${renderColorSelect(p.isBall ? `color1-${p.id}` : `color-${p.id}`, oxfordColors)}`;
         if (p.isBall) html += `<label>Колір 2:</label>${renderColorSelect(`color2-${p.id}`, oxfordColors)}`;
         
-        if (p.hasInnerCase) html += `<div class="checkbox-group"><input type="checkbox" id="case-${p.id}" onchange="updatePrice('${p.id}')"> Додати чохол (+190 грн)</div>`;
+        if (p.hasInnerCase) html += `<div class="checkbox-group"><input type="checkbox" id="case-${p.id}" onchange="updatePrice('${p.id}')"> Додати внутр. чохол (+190 грн)</div>`;
         if (p.options) html += `<label>Опції:</label><select id="opt-${p.id}" onchange="updatePrice('${p.id}')">${Object.keys(p.options).map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
         
-        // Поле вибору кількості
         html += `<div class="qty-container"><label style="margin:0">Кількість:</label><input type="number" id="qty-${p.id}" class="qty-input" value="1" min="1" onchange="updatePrice('${p.id}')"></div>`;
         
         html += `<div class="price-tag"><span id="price-val-${p.id}">0</span> грн</div><button class="btn" onclick="addToCart('${p.id}')">В кошик</button>`;
@@ -75,7 +74,7 @@ function renderCatalog() {
 
 function renderColorSelect(id, palette) {
     const firstHex = Object.values(palette)[0];
-    return `<select id="${id}" class="color-select" style="background-color: ${firstHex}; color: ${firstHex === '#ffffff' ? 'black' : 'white'};" onchange="const c=this.options[this.selectedIndex].dataset.color; this.style.backgroundColor=c; this.style.color=(c==='#ffffff'?'black':'white');">
+    return `<select id="${id}" class="color-select" style="background-color: ${firstHex}; color: ${firstHex === '#ffffff' ? 'black' : 'white'}; border-left: 10px solid rgba(0,0,0,0.1);" onchange="const c=this.options[this.selectedIndex].dataset.color; this.style.backgroundColor=c; this.style.color=(c==='#ffffff'?'black':'white');">
         ${Object.entries(palette).map(([name, hex]) => 
             `<option value="${name}" data-color="${hex}" style="background-color: ${hex}; color: ${hex === '#ffffff' ? 'black' : 'white'};">${name}</option>`
         ).join('')}
@@ -103,29 +102,29 @@ function addToCart(id) {
     const size = p.sizes ? document.getElementById(`size-${id}`).value : '';
     const color = document.getElementById(`color-${id}`)?.value || document.getElementById(`color1-${id}`).value;
     
-    let desc = `${p.id === 'beanbag' ? `Крісло (${type})` : p.name} | ${size} | ${color}`;
+    let displayName = p.id === 'beanbag' ? `Крісло (${type})` : p.name;
+    let desc = `${displayName} | ${size} | ${color}`;
+    
     if (p.isBall) desc += ` + ${document.getElementById(`color2-${id}`).value}`;
     if (p.hasInnerCase && document.getElementById(`case-${id}`).checked) desc += ` + Внутр. чохол`;
 
-    cart.push({ 
-        id: Date.now(), 
-        name: desc, 
-        qty: qty,
-        price: unitPrice * qty 
-    });
+    cart.push({ id: Date.now(), name: desc, qty: qty, price: unitPrice * qty });
     updateCartUI();
-    document.getElementById(`qty-${id}`).value = 1; // Скидаємо лічильник після додавання
+    document.getElementById(`qty-${id}`).value = 1;
+    
+    // Візуальний відгук
+    tg.HapticFeedback.impactOccurred('medium');
 }
 
 function updateCartUI() {
-    const cartItems = document.getElementById('cart-items');
-    cartItems.innerHTML = cart.map(item => `
+    const details = document.getElementById('cart-details');
+    details.innerHTML = cart.map(item => `
         <div class="cart-item">
-            <div class="cart-item-info">
-                <span>${item.name}</span>
-                <span class="cart-item-qty">Кількість: ${item.qty} шт. | ${item.price} грн</span>
+            <div style="flex:1;">
+                <div style="font-weight:bold; font-size:14px;">${item.name}</div>
+                <div style="font-size:12px; color:#666;">Кількість: ${item.qty} шт. | Сума: ${item.price} грн</div>
             </div>
-            <button onclick="removeFromCart(${item.id})" class="remove-item">❌</button>
+            <div class="remove-item" onclick="removeFromCart(${item.id})">❌</div>
         </div>
     `).join('');
     
@@ -137,16 +136,22 @@ function updateCartUI() {
 function removeFromCart(uid) {
     cart = cart.filter(item => item.id !== uid);
     updateCartUI();
+    if(cart.length === 0) {
+        document.getElementById('cart-details').style.display = 'none';
+    }
 }
 
 function sendOrder() {
     if (cart.length === 0) return;
-    // Формуємо текст для бота з урахуванням кількості
+    
+    const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
     const itemsDesc = cart.map(i => `${i.name} (x${i.qty})`).join(', ');
+
     tg.sendData(JSON.stringify({ 
         action: 'order', 
         items: itemsDesc, 
-        totalPrice: document.getElementById('total-price').innerText 
+        totalPrice: document.getElementById('total-price').innerText,
+        totalQty: totalQty
     }));
     tg.close();
 }

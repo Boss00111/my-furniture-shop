@@ -19,13 +19,61 @@
         .price-tag { font-size: 20px; font-weight: bold; color: var(--primary-color); margin: 10px 0; }
         .btn { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-        /* КОМПАКТНИЙ КОШИК */
-        #cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 10px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); z-index: 1000; border-top-left-radius: 20px; border-top-right-radius: 20px; }
-        #cart-details { display: none; margin-bottom: 10px; max-height: 200px; overflow-y: auto; border-bottom: 1px solid #eee; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-size: 14px; border-bottom: 1px solid #f9f9f9; }
-        .remove-item { color: red; font-weight: bold; padding: 5px; cursor: pointer; }
-        .cart-main-info { display: flex; justify-content: space-between; align-items: center; }
-        .toggle-cart-btn { background: #eee; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; }
+        /* Оновлений компактний кошик */
+#cart-bar { 
+    position: fixed; 
+    bottom: 0; 
+    left: 0; 
+    right: 0; 
+    background: white; 
+    padding: 10px 15px; 
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.1); 
+    z-index: 1000; 
+    border-top-left-radius: 20px; 
+    border-top-right-radius: 20px; 
+}
+
+.cart-main-info { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    gap: 10px; /* Відстань між лівою та правою частинами */
+}
+
+.cart-left-side {
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Займає вільний простір зліва */
+}
+
+.toggle-cart-btn { 
+    background: #f0f0f0; 
+    border: 1px solid #ddd; 
+    padding: 6px 12px; 
+    border-radius: 8px; 
+    font-size: 11px; 
+    cursor: pointer;
+    white-space: nowrap;
+    width: fit-content;
+}
+
+.total-sum-box {
+    font-weight: bold; 
+    font-size: 16px;
+    margin-top: 4px;
+    color: var(--primary-color);
+}
+
+.order-btn { 
+    width: 140px; /* Фіксована ширина кнопки оформлення */
+    padding: 12px; 
+    background: var(--primary-color); 
+    color: white; 
+    border: none; 
+    border-radius: 10px; 
+    font-weight: bold; 
+    font-size: 15px;
+}
     </style>
 </head>
 <body>
@@ -58,3 +106,4 @@
     </script>
 </body>
 </html>
+

@@ -129,15 +129,25 @@ function updateCartUI() {
     `).join('');
     
     const total = cart.reduce((sum, item) => sum + item.price, 0);
-    document.getElementById('cart-bar').style.display = cart.length > 0 ? 'block' : 'none';
+    const cartBar = document.getElementById('cart-bar');
+    
+    // Якщо це перший товар — переконуємось, що список прихований
+    if (cart.length > 0 && cartBar.style.display === 'none') {
+        details.style.display = 'none'; // Гарантовано ховаємо список при першій появі
+        document.querySelector('.toggle-cart-btn').innerText = '🛒 Подивитись кошик';
+    }
+
+    cartBar.style.display = cart.length > 0 ? 'block' : 'none';
     document.getElementById('total-price').innerText = total;
 }
 
 function removeFromCart(uid) {
     cart = cart.filter(item => item.id !== uid);
     updateCartUI();
+    // Якщо видалили останній товар — повністю ховаємо панель
     if(cart.length === 0) {
         document.getElementById('cart-details').style.display = 'none';
+        document.getElementById('cart-bar').style.display = 'none';
     }
 }
 

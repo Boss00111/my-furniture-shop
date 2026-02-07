@@ -2,102 +2,196 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Comfort Plus | Меблі</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #007bff; --success: #28a745; --bg: #f4f7f6; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 0; }
-        header { background: white; padding: 15px 0 0; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .menu-wrapper { display: flex; overflow-x: auto; gap: 8px; padding: 12px 15px; scrollbar-width: none; }
-        .menu-wrapper::-webkit-scrollbar { display: none; }
-        .menu-wrapper button { white-space: nowrap; padding: 8px 18px; border: 1px solid #eee; border-radius: 20px; background: #fdfdfd; font-size: 13px; font-weight: 600; flex-shrink: 0; cursor: pointer; }
+        :root { --primary: #007bff; --success: #28a745; --bg: #f8f9fa; --text: #333; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; }
         
-        #catalog-container { padding: 10px; max-width: 1000px; margin: 0 auto; }
-        .category-title { text-align: center; margin: 40px 0 20px; font-size: 20px; font-weight: 700; color: #444; text-transform: uppercase; letter-spacing: 1px; }
-        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
-        .product-card { background: white; border-radius: 15px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; display: flex; flex-direction: column; }
-        .product-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; }
-        .product-card h3 { font-size: 13px; margin: 12px 0 8px; min-height: 32px; }
-        .price-tag { font-weight: 700; color: var(--success); font-size: 16px; margin-bottom: 12px; }
-        .btn-select { background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: auto; }
+        header { background: white; padding: 15px 0 0; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        h1 { font-size: 18px; margin: 0 0 15px; font-weight: 700; }
 
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: flex-end; }
-        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; }
+        /* Меню з підказкою для скролу */
+        .menu-wrapper { position: relative; background: white; border-top: 1px solid #eee; display: flex; align-items: center; }
+        .category-menu { 
+            display: flex; overflow-x: auto; gap: 10px; padding: 12px 15px; 
+            scrollbar-width: none; -webkit-overflow-scrolling: touch; cursor: grab;
+        }
+        .category-menu:active { cursor: grabbing; }
+        .category-menu::-webkit-scrollbar { display: none; }
+        .category-menu button { 
+            white-space: nowrap; padding: 9px 20px; border: 1px solid #eee; 
+            border-radius: 25px; background: #fff; font-size: 13px; font-weight: 600; 
+            flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: 0.2s;
+        }
+        .category-menu button:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* Каталог */
+        #catalog-container { padding: 15px; max-width: 1100px; margin: 0 auto; }
+        .category-title { text-align: center; margin: 40px 0 20px; font-size: 19px; color: #444; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
+
+        .product-card { 
+            background: white; border-radius: 18px; padding: 12px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.04); text-align: center;
+            display: flex; flex-direction: column; transition: transform 0.2s;
+        }
+        .product-card:active { transform: scale(0.98); }
+        .product-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-bottom: 10px; }
+        .product-card h3 { font-size: 14px; margin: 5px 0 8px; min-height: 34px; line-height: 1.2; color: #222; }
+        .price-tag { font-weight: 700; color: var(--success); font-size: 16px; margin-bottom: 12px; }
+        .btn-select { background: var(--primary); color: white; border: none; padding: 11px; border-radius: 10px; font-weight: 700; cursor: pointer; width: 100%; margin-top: auto; }
+
+        /* Модальне вікно */
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: flex-end; }
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; padding: 25px; position: relative; animation: slideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<header>
-    <h1 style="font-size: 18px; margin: 0 0 10px;">🛍️ Comfort Plus</h1>
-    <div class="menu-wrapper" id="main-menu"></div>
-</header>
+    <header>
+        <h1>🛍️ Comfort Plus | Меблі</h1>
+        <div class="menu-wrapper">
+            <div class="category-menu" id="main-menu"></div>
+        </div>
+    </header>
 
-<div id="catalog-container">Завантаження...</div>
+    <div id="catalog-container">
+        <p style="text-align:center; padding:50px; color:#888;">Завантаження товарів...</p>
+    </div>
 
-<script>
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/1Kd4ODQgS8QOFHOg2k4lCvRgizqSRnY17qiaStmV6BNY/export?format=csv&gid=415679695';
+    <script>
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/1Kd4ODQgS8QOFHOg2k4lCvRgizqSRnY17qiaStmV6BNY/export?format=csv&gid=415679695';
 
-async function loadData() {
-    const res = await fetch(CSV_URL);
-    const data = await res.text();
-    const rows = data.split('\n').slice(1);
-    
-    const products = rows.map(row => {
-        const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/"/g, '').trim());
-        const num = (v) => parseFloat(v?.replace(',', '.')) || 0;
-        return { id: c[0], cat: c[1], name: c[2], img: c[3], base: num(c[4]), xl: num(c[5]) };
-    }).filter(p => p.id);
-
-    render(products);
-}
-
-function render(products) {
-    const menu = document.getElementById('main-menu');
-    const catalog = document.getElementById('catalog-container');
-    menu.innerHTML = '';
-    catalog.innerHTML = '';
-
-    const grouped = {};
-    products.forEach(p => {
-        if (!grouped[p.cat]) grouped[p.cat] = [];
-        grouped[p.cat].push(p);
-    });
-
-    Object.keys(grouped).forEach(catName => {
-        const safeId = "cat-" + catName.replace(/\s+/g, '-');
-        
-        // Кнопка
-        const btn = document.createElement('button');
-        btn.innerText = catName;
-        btn.onclick = () => {
-            const el = document.getElementById(safeId);
-            window.scrollTo({ top: el.offsetTop - 100, behavior: 'smooth' });
+        // Словник для автоматичного перекладу НАЗВ виробів
+        const nameTranslation = {
+            'Прямая подушка': 'Пряма подушка',
+            'Круглая подушка': 'Кругла подушка',
+            'Двухместная': 'Двомісна',
+            'Кресло-Груша': 'Крісло-Груша',
+            'Кресло-Овал': 'Крісло-Овал',
+            'Кресло-Панда': 'Крісло-Панда',
+            'Кресло-Сова': 'Крісло-Сова',
+            'Единорог': 'Єдиноріг',
+            'Ежик Соник': 'Їжак Сонік',
+            'Кот': 'Кіт'
         };
-        menu.appendChild(btn);
 
-        // Розділ
-        const section = document.createElement('section');
-        section.id = safeId;
-        section.innerHTML = `<h2 class="category-title">--- ${catName} ---</h2>`;
-        const grid = document.createElement('div');
-        grid.className = 'product-grid';
+        let products = [];
 
-        grouped[catName].forEach(p => {
-            const price = p.base > 0 ? p.base : p.xl;
-            grid.innerHTML += `
-                <div class="product-card">
-                    <img src="images/${p.img}" onerror="this.src='https://via.placeholder.com/200'">
-                    <h3>${p.name}</h3>
-                    <div class="price-tag">від ${price} грн</div>
-                    <button class="btn-select" onclick="alert('Ціна: ${price} грн')">Вибрати</button>
-                </div>`;
-        });
-        section.appendChild(grid);
-        catalog.appendChild(section);
-    });
-}
-loadData();
-</script>
+        async function init() {
+            try {
+                const res = await fetch(CSV_URL);
+                const csv = await res.text();
+                const rows = csv.split('\n').slice(1);
+                
+                products = rows.map(row => {
+                    const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/"/g, '').trim());
+                    const num = (v) => parseFloat(v?.replace(',', '.')) || 0;
+                    
+                    // Перекладаємо назву, якщо вона є у словнику
+                    let ukrName = c[2];
+                    for (let key in nameTranslation) {
+                        if (ukrName.includes(key)) ukrName = ukrName.replace(key, nameTranslation[key]);
+                    }
+
+                    return {
+                        id: c[0], cat: c[1], name: ukrName, img: c[3],
+                        base: num(c[4]), xl: num(c[5])
+                    };
+                }).filter(p => p.id);
+
+                render();
+                enableDragScroll();
+            } catch (e) {
+                document.getElementById('catalog-container').innerHTML = "Помилка завантаження бази.";
+            }
+        }
+
+        function render() {
+            const menu = document.getElementById('main-menu');
+            const catalog = document.getElementById('catalog-container');
+            menu.innerHTML = '';
+            catalog.innerHTML = '';
+
+            const grouped = {};
+            products.forEach(p => {
+                if (!grouped[p.cat]) grouped[p.cat] = [];
+                grouped[p.cat].push(p);
+            });
+
+            Object.keys(grouped).forEach(catName => {
+                const safeId = "cat-" + catName.replace(/\s+/g, '-');
+                
+                // Кнопка меню
+                const btn = document.createElement('button');
+                btn.innerText = catName;
+                btn.onclick = () => {
+                    const el = document.getElementById(safeId);
+                    window.scrollTo({ top: el.offsetTop - 120, behavior: 'smooth' });
+                };
+                menu.appendChild(btn);
+
+                // Секція каталогу
+                const section = document.createElement('section');
+                section.id = safeId;
+                section.innerHTML = `<h2 class="category-title">--- ${catName} ---</h2>`;
+                
+                const grid = document.createElement('div');
+                grid.className = 'product-grid';
+
+                grouped[catName].forEach(p => {
+                    const price = p.base > 0 ? p.base : p.xl;
+                    grid.innerHTML += `
+                        <div class="product-card">
+                            <img src="images/${p.img}" onerror="this.src='https://via.placeholder.com/250?text=Comfort+Plus'">
+                            <h3>${p.name}</h3>
+                            <div class="price-tag">від ${price} грн</div>
+                            <button class="btn-select" onclick="openModal('${p.id}')">Вибрати</button>
+                        </div>`;
+                });
+                section.appendChild(grid);
+                catalog.appendChild(section);
+            });
+            createModalSkeleton();
+        }
+
+        // Перетягування мишкою для ПК
+        function enableDragScroll() {
+            const slider = document.querySelector('.category-menu');
+            let isDown = false, startX, scrollLeft;
+            slider.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
+            slider.addEventListener('mouseleave', () => isDown = false);
+            slider.addEventListener('mouseup', () => isDown = false);
+            slider.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; slider.scrollLeft = scrollLeft - (x - startX) * 2; });
+        }
+
+        function openModal(id) {
+            const p = products.find(x => x.id === id);
+            const body = document.getElementById('modal-body');
+            body.innerHTML = `
+                <img src="images/${p.img}" style="width:100%; border-radius:15px; margin-bottom:15px;">
+                <h2 style="margin:0 0 10px; font-size:20px;">${p.name}</h2>
+                <p style="font-size:18px; color:var(--success); font-weight:700;">Ціна: ${p.base || p.xl} грн</p>
+                <button onclick="closeModal()" style="width:100%; padding:14px; background:#f0f0f0; border:none; border-radius:12px; margin-top:15px; font-weight:700; cursor:pointer;">Назад до каталогу</button>
+            `;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function createModalSkeleton() {
+            if (document.getElementById('modal')) return;
+            const m = document.createElement('div');
+            m.id = 'modal';
+            m.innerHTML = `<div class="modal-content"><div id="modal-body"></div></div>`;
+            m.onclick = (e) => { if(e.target.id === 'modal') closeModal(); };
+            document.body.appendChild(m);
+        }
+
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+        init();
+    </script>
 </body>
 </html>

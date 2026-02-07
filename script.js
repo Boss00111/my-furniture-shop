@@ -4,7 +4,7 @@ const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?forma
 
 let products = [];
 
-// Словник перекладу (ЖОРСТКИЙ)
+// Словник перекладу та ОБ'ЄДНАННЯ
 const categoryMap = {
     'Кресла': 'Крісла Classic',
     'Игрушка': 'Крісла-Іграшки',
@@ -27,7 +27,7 @@ async function loadProducts() {
             const parsePrice = (val) => parseFloat(val?.replace(',', '.')) || 0;
             return {
                 id: cols[0],
-                category: cols[1],
+                category: cols[1], // Оригінальна категорія з таблиці
                 name: cols[2],
                 image: cols[3],
                 basePrice: parsePrice(cols[4]),
@@ -44,7 +44,7 @@ async function loadProducts() {
         renderMenu();
         renderCatalog();
         createModalHTML();
-        enableMouseScroll(); // Вмикаємо скрол мишкою
+        enableMouseDrag(); 
     } catch (e) {
         container.innerHTML = '<p>Помилка завантаження.</p>';
     }
@@ -52,9 +52,7 @@ async function loadProducts() {
 
 function renderMenu() {
     const header = document.querySelector('header');
-    // Очищаємо старе меню та обгортку
-    const oldWrapper = document.querySelector('.menu-wrapper');
-    if (oldWrapper) oldWrapper.remove();
+    if (document.querySelector('.menu-wrapper')) document.querySelector('.menu-wrapper').remove();
 
     const wrapper = document.createElement('div');
     wrapper.className = 'menu-wrapper';
@@ -62,28 +60,20 @@ function renderMenu() {
     const menu = document.createElement('div');
     menu.className = 'category-menu';
     
+    // Створюємо унікальні кнопки на основі нашого словника
     const displayCategories = [...new Set(Object.values(categoryMap))];
     
     displayCategories.forEach(displayCat => {
         const btn = document.createElement('button');
         btn.innerText = displayCat;
         btn.onclick = () => {
-            // Знаходимо секцію за текстом заголовка
-            const titles = document.querySelectorAll('.category-title');
-            for (let t of titles) {
-                if (t.innerText.includes(displayCat)) {
-                    const offset = 120; // Відступ зверху, щоб заголовок не ховався під шапку
-                    const bodyRect = document.body.getBoundingClientRect().top;
-                    const elementRect = t.getBoundingClientRect().top;
-                    const elementPosition = elementRect - bodyRect;
-                    const offsetPosition = elementPosition - offset;
-
-                    window.scrollTo({
-                        top: offsetPosition,
-                        behavior: 'smooth'
-                    });
-                    break;
-                }
+            // Шукаємо секцію, ID якої ми згенеруємо нижче в renderCatalog
+            const targetId = `section-${displayCat.replace(/\s+/g, '-')}`;
+            const target = document.getElementById(targetId);
+            if (target) {
+                const offset = 100;
+                const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                window.scrollTo({ top, behavior: 'smooth' });
             }
         };
         menu.appendChild(btn);
@@ -97,15 +87,18 @@ function renderCatalog() {
     const container = document.getElementById('catalog-container');
     container.innerHTML = '';
     
+    // Групуємо товари за новими іменами категорій
     const grouped = {};
     products.forEach(p => {
-        const catName = categoryMap[p.category] || p.category;
-        if (!grouped[catName]) grouped[catName] = [];
-        grouped[catName].push(p);
+        const mappedName = categoryMap[p.category] || p.category;
+        if (!grouped[mappedName]) grouped[mappedName] = [];
+        grouped[mappedName].push(p);
     });
 
     for (let catName in grouped) {
         const section = document.createElement('section');
+        // Створюємо унікальний ID для скролу
+        section.id = `section-${catName.replace(/\s+/g, '-')}`;
         section.innerHTML = `<h2 class="category-title">--- ${catName} ---</h2>`;
         
         const grid = document.createElement('div');
@@ -119,39 +112,26 @@ function renderCatalog() {
                 <img src="images/${p.image}" onerror="this.src='https://via.placeholder.com/150'">
                 <h3>${p.name}</h3>
                 <p class="price-tag">від ${minPrice} грн</p>
-                <button class="btn-select" onclick="openConfigurator('${p.id}')">Налаштувати</button>
+                <button class="btn-select" onclick="openConfigurator('${p.id}')">Вибрати</button>
             `;
             grid.appendChild(card);
         });
-        container.appendChild(section);
         section.appendChild(grid);
+        container.appendChild(section);
     }
 }
 
-// Допоміжна функція для скролу мишкою (drag-to-scroll)
-function enableMouseScroll() {
+// Функція перетягування мишкою
+function enableMouseDrag() {
     const slider = document.querySelector('.category-menu');
-    let isDown = false;
-    let startX;
-    let scrollLeft;
-
-    slider.addEventListener('mousedown', (e) => {
-        isDown = true;
-        startX = e.pageX - slider.offsetLeft;
-        scrollLeft = slider.scrollLeft;
-    });
-    slider.addEventListener('mouseleave', () => { isDown = false; });
-    slider.addEventListener('mouseup', () => { isDown = false; });
-    slider.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - slider.offsetLeft;
-        const walk = (x - startX) * 2;
-        slider.scrollLeft = scrollLeft - walk;
-    });
+    let isDown = false, startX, scrollLeft;
+    slider.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
+    slider.addEventListener('mouseleave', () => isDown = false);
+    slider.addEventListener('mouseup', () => isDown = false);
+    slider.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; slider.scrollLeft = scrollLeft - (x - startX) * 2; });
 }
 
-// Функції модалки (залишаються як були)
+// Модалка (поки заглушка)
 function openConfigurator(productId) {
     const p = products.find(item => item.id === productId);
     const modal = document.getElementById('modal');
@@ -159,8 +139,8 @@ function openConfigurator(productId) {
     document.getElementById('modal-body').innerHTML = `
         <img src="images/${p.image}" style="width:100%; border-radius:10px;">
         <h2>${p.name}</h2>
-        <p>Ціна бази: ${p.basePrice || p.sizeXL} грн</p>
-        <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; padding:12px; background:#666; color:white; border:none; border-radius:8px; margin-top:15px;">Закрити</button>
+        <p>Обрана модель: ${p.id}</p>
+        <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; padding:12px; background:#007bff; color:white; border:none; border-radius:8px; margin-top:15px;">Зрозуміло</button>
     `;
 }
 

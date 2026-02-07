@@ -4,34 +4,33 @@ const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?forma
 
 let products = [];
 
+// Словник для перекладу категорій
+const categoryTranslate = {
+    'Кресла': 'Крісла-Груші',
+    'Игрушка': 'Крісла-Іграшки',
+    'Дизайн': 'Авто-серія та Дизайн',
+    'Мяч': 'М\'ячі',
+    'Качеля обычная': 'Гойдалки (одномісні)',
+    'Качеля двухместная': 'Гойдалки (двомісні)',
+    'Футон': 'Футони'
+};
+
 async function loadProducts() {
     const container = document.getElementById('catalog-container');
-    if (!container) {
-        console.error("Помилка: Не знайдено catalog-container в HTML!");
-        return;
-    }
-    
-    container.innerHTML = '<p style="text-align:center;">Завантаження товарів...</p>';
-
     try {
         const response = await fetch(CSV_URL);
-        if (!response.ok) throw new Error('Помилка мережі');
         const data = await response.text();
-        
         const rows = data.split('\n').slice(1);
         
         products = rows.map(row => {
-            // Очищення від лапок та поділ
             const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim());
-            
-            // Функція для перетворення ціни (заміна коми на крапку)
             const parsePrice = (val) => parseFloat(val?.replace(',', '.')) || 0;
 
             return {
-                id: cols[0] || '',
-                category: cols[1] || '',
-                name: cols[2] || '',
-                image: cols[3] || '',
+                id: cols[0],
+                category: cols[1],
+                name: cols[2],
+                image: cols[3],
                 basePrice: parsePrice(cols[5]),
                 sizeXL: parsePrice(cols[6]),
                 size2XL: parsePrice(cols[7]),
@@ -41,54 +40,65 @@ async function loadProducts() {
                 velurExtra: parsePrice(cols[11]),
                 isDesign: cols[12]?.toLowerCase() === 'yes'
             };
-        }).filter(p => p.id !== '');
+        }).filter(p => p.id);
 
-        if (products.length === 0) {
-            container.innerHTML = '<p style="text-align:center;">Товари не знайдені в таблиці.</p>';
-        } else {
-            renderCatalog();
-        }
-    } catch (error) {
-        container.innerHTML = `<p style="text-align:center; color:red;">Помилка зв'язку з таблицею. Перевірте публікацію.</p>`;
+        renderMenu();
+        renderCatalog();
+    } catch (e) {
+        container.innerHTML = '<p>Помилка оновлення. Спробуйте пізніше.</p>';
     }
+}
+
+function renderMenu() {
+    const header = document.querySelector('header');
+    const menu = document.createElement('div');
+    menu.className = 'category-menu';
+    
+    const categories = [...new Set(products.map(p => p.category))];
+    categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.innerText = categoryTranslate[cat] || cat;
+        btn.onclick = () => {
+            document.getElementById(cat).scrollIntoView({ behavior: 'smooth' });
+        };
+        menu.appendChild(btn);
+    });
+    header.appendChild(menu);
 }
 
 function renderCatalog() {
     const container = document.getElementById('catalog-container');
     container.innerHTML = '';
-    
     const categories = [...new Set(products.map(p => p.category))];
     
     categories.forEach(cat => {
-        const sectionTitle = document.createElement('h2');
-        sectionTitle.style.cssText = 'text-align:center; margin-top:30px; border-bottom: 2px solid #eee; padding-bottom:10px;';
-        sectionTitle.innerText = `--- ${cat} ---`;
-        container.appendChild(sectionTitle);
-
-        const categoryProducts = products.filter(p => p.category === cat);
+        const section = document.createElement('section');
+        section.id = cat;
+        section.innerHTML = `<h2 class="category-title">${categoryTranslate[cat] || cat}</h2>`;
         
         const grid = document.createElement('div');
-        grid.style.cssText = 'display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;';
+        grid.className = 'product-grid';
         
-        categoryProducts.forEach(product => {
+        products.filter(p => p.category === cat).forEach(p => {
+            const minPrice = p.basePrice > 0 ? p.basePrice : p.sizeXL;
             const card = document.createElement('div');
             card.className = 'product-card';
-            card.style.cssText = 'width: 160px; border: 1px solid #eee; border-radius: 12px; padding: 10px; text-align: center; background: white;';
-
-            // Визначаємо стартову ціну
-            const displayPrice = product.basePrice > 0 ? product.basePrice : product.sizeXL;
-
             card.innerHTML = `
-                <img src="images/${product.image}" style="width:100%; height:140px; object-fit: cover; border-radius: 8px;" 
-                     onerror="this.src='https://via.placeholder.com/150?text=Фото'">
-                <h3 style="font-size: 14px; margin: 10px 0;">${product.name}</h3>
-                <p style="font-weight: bold; color: #28a745; margin-bottom: 10px;">від ${displayPrice} грн</p>
-                <button style="width: 100%; padding: 8px; border: none; border-radius: 6px; background: #007bff; color: white; cursor: pointer;">Вибрати</button>
+                <img src="images/${p.image}" onerror="this.src='https://via.placeholder.com/150'">
+                <h3>${p.name}</h3>
+                <p class="price-tag">від ${minPrice} грн</p>
+                <button class="btn-select" onclick="openConfigurator('${p.id}')">Налаштувати</button>
             `;
             grid.appendChild(card);
         });
-        container.appendChild(grid);
+        section.appendChild(grid);
+        container.appendChild(section);
     });
+}
+
+function openConfigurator(productId) {
+    const p = products.find(item => item.id === productId);
+    alert(`Конфігуратор для ${p.name} в розробці. Ціна бази: ${p.basePrice} грн. Скоро тут буде вибір кольору!`);
 }
 
 loadProducts();

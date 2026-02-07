@@ -4,7 +4,7 @@ const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?forma
 
 let products = [];
 
-// Твій оновлений список категорій для сайту
+// Словник перекладу (ЖОРСТКИЙ)
 const categoryMap = {
     'Кресла': 'Крісла Classic',
     'Игрушка': 'Крісла-Іграшки',
@@ -25,7 +25,6 @@ async function loadProducts() {
         products = rows.map(row => {
             const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.replace(/"/g, '').trim());
             const parsePrice = (val) => parseFloat(val?.replace(',', '.')) || 0;
-
             return {
                 id: cols[0],
                 category: cols[1],
@@ -45,45 +44,59 @@ async function loadProducts() {
         renderMenu();
         renderCatalog();
         createModalHTML();
+        enableMouseScroll(); // Вмикаємо скрол мишкою
     } catch (e) {
-        container.innerHTML = '<p>Помилка завантаження. Перевірте інтернет.</p>';
+        container.innerHTML = '<p>Помилка завантаження.</p>';
     }
 }
 
 function renderMenu() {
     const header = document.querySelector('header');
-    let menu = document.querySelector('.category-menu');
-    if (menu) menu.remove();
+    // Очищаємо старе меню та обгортку
+    const oldWrapper = document.querySelector('.menu-wrapper');
+    if (oldWrapper) oldWrapper.remove();
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'menu-wrapper';
     
-    menu = document.createElement('div');
+    const menu = document.createElement('div');
     menu.className = 'category-menu';
     
-    // Отримуємо унікальні імена для кнопок (після перекладу та об'єднання)
     const displayCategories = [...new Set(Object.values(categoryMap))];
     
     displayCategories.forEach(displayCat => {
         const btn = document.createElement('button');
         btn.innerText = displayCat;
         btn.onclick = () => {
-            // Шукаємо перший заголовок з такою назвою та скролимо до нього
-            const sections = document.querySelectorAll('.category-title');
-            for (let s of sections) {
-                if (s.innerText.includes(displayCat)) {
-                    s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Знаходимо секцію за текстом заголовка
+            const titles = document.querySelectorAll('.category-title');
+            for (let t of titles) {
+                if (t.innerText.includes(displayCat)) {
+                    const offset = 120; // Відступ зверху, щоб заголовок не ховався під шапку
+                    const bodyRect = document.body.getBoundingClientRect().top;
+                    const elementRect = t.getBoundingClientRect().top;
+                    const elementPosition = elementRect - bodyRect;
+                    const offsetPosition = elementPosition - offset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
                     break;
                 }
             }
         };
         menu.appendChild(btn);
     });
-    header.appendChild(menu);
+    
+    wrapper.appendChild(menu);
+    header.appendChild(wrapper);
 }
 
 function renderCatalog() {
     const container = document.getElementById('catalog-container');
     container.innerHTML = '';
     
-    // Створюємо список груп (об'єднуємо звичайні та двомісні гойдалки)
     const grouped = {};
     products.forEach(p => {
         const catName = categoryMap[p.category] || p.category;
@@ -110,24 +123,44 @@ function renderCatalog() {
             `;
             grid.appendChild(card);
         });
-        section.appendChild(grid);
         container.appendChild(section);
+        section.appendChild(grid);
     }
 }
 
-// Залишаємо openConfigurator та createModalHTML як були раніше
+// Допоміжна функція для скролу мишкою (drag-to-scroll)
+function enableMouseScroll() {
+    const slider = document.querySelector('.category-menu');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    slider.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+    });
+    slider.addEventListener('mouseleave', () => { isDown = false; });
+    slider.addEventListener('mouseup', () => { isDown = false; });
+    slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 2;
+        slider.scrollLeft = scrollLeft - walk;
+    });
+}
+
+// Функції модалки (залишаються як були)
 function openConfigurator(productId) {
     const p = products.find(item => item.id === productId);
     const modal = document.getElementById('modal');
-    const content = document.getElementById('modal-body');
     modal.style.display = 'flex';
-    content.innerHTML = `
-        <img src="images/${p.image}" style="width:100%; border-radius:10px; margin-bottom:15px;">
+    document.getElementById('modal-body').innerHTML = `
+        <img src="images/${p.image}" style="width:100%; border-radius:10px;">
         <h2>${p.name}</h2>
-        <div style="margin-top:20px; padding:15px; background:#f9f9f9; border-radius:10px;">
-            <span style="font-size:18px; font-weight:bold;">Ціна: ${p.basePrice || p.sizeXL} грн</span>
-            <button onclick="document.getElementById('modal').style.display='none'" style="float:right; background:#666; color:white; border:none; padding:8px 15px; border-radius:6px;">Закрити</button>
-        </div>
+        <p>Ціна бази: ${p.basePrice || p.sizeXL} грн</p>
+        <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; padding:12px; background:#666; color:white; border:none; border-radius:8px; margin-top:15px;">Закрити</button>
     `;
 }
 

@@ -34,13 +34,13 @@
         
         select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #eee; font-size: 14px; font-weight: 600; background: #fafafa; cursor: pointer; }
         
-        .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; border: 1px solid #eee; font-size: 13px; font-weight: 600; transition: 0.2s; }
+        .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid #eee; font-size: 13px; font-weight: 600; }
         .check-item input { width: 18px; height: 18px; pointer-events: none; }
 
-        /* Quantity Input Style */
+        /* Quantity Input */
         .qty-box { display: flex; align-items: center; background: #f0f0f0; border-radius: 10px; padding: 5px; width: fit-content; margin: 10px 0; }
         .qty-btn { width: 40px; height: 40px; border: none; background: white; border-radius: 8px; font-size: 20px; font-weight: 700; cursor: pointer; color: var(--primary); }
-        .qty-input { width: 60px; border: none; background: transparent; text-align: center; font-size: 18px; font-weight: 800; color: #333; outline: none; }
+        .qty-input { width: 70px; border: none; background: transparent; text-align: center; font-size: 18px; font-weight: 800; color: #333; outline: none; }
 
         .total-box { background: #eef8ff; padding: 15px; border-radius: 12px; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #cce5ff; }
         .total-price { font-size: 20px; font-weight: 800; color: var(--primary); }
@@ -63,28 +63,28 @@
 
         const COLOR_DATABASE = {
             oxford: [
-                { n: "2 - коричневий", c: "#4B2D0E", active: true }, { n: "3 - какао", c: "#A38A75", active: true },
-                { n: "4 - бежевий", c: "#F5F5DC", active: true }, { n: "4/1 - пісочний", c: "#C2B280", active: true },
-                { n: "4/2 - пудровий", c: "#DEB887", active: true }, { n: "5 - електрик", c: "#0000FF", active: true },
-                { n: "6 - трава", c: "#008000", active: true }, { n: "7 - малина", c: "#E30B5D", active: true },
-                { n: "8 - темно-синій", c: "#000080", active: true }, { n: "9 - блакитний", c: "#00BFFF", active: true },
-                { n: "10 - фіолетовий", c: "#800080", active: true }, { n: "11 - м'ята", c: "#3EB489", active: true },
-                { n: "12 - червоний", c: "#FF0000", active: true }, { n: "13 - гірчичний", c: "#E1AD01", active: true },
-                { n: "14 - жовтий", c: "#FFD700", active: true }, { n: "14/1 - жовтогарячий", c: "#FF8C00", active: true },
-                { n: "15 - сірий", c: "#808080", active: true }, { n: "17 - темно-сірий", c: "#4F4F4F", active: true },
-                { n: "18 - вино", c: "#722F37", active: true }, { n: "19 - блакитний світлий", c: "#ADD8E6", active: true },
-                { n: "20 - білий", c: "#FFFFFF", active: true }, { n: "21 - рожевий пиловий", c: "#C08081", active: true },
-                { n: "22 - оранжевий", c: "#FFA500", active: true }, { n: "26 - салат", c: "#7CFC00", active: true },
-                { n: "27 - бузок", c: "#C8A2C8", active: true }, { n: "28 - темно-зелений", c: "#006400", active: true },
-                { n: "29 - хакі", c: "#C3B091", active: true }, { n: "30 - чорний", c: "#000000", active: true },
-                { n: "32 - рожевий (Барбі)", c: "#DA1884", active: true }
+                { n: "2 - коричневий", c: "#4B2D0E" }, { n: "3 - какао", c: "#A38A75" },
+                { n: "4 - бежевий", c: "#F5F5DC" }, { n: "4/1 - пісочний", c: "#C2B280" },
+                { n: "4/2 - пудровий", c: "#DEB887" }, { n: "5 - електрик", c: "#0000FF" },
+                { n: "6 - трава", c: "#008000" }, { n: "7 - малина", c: "#E30B5D" },
+                { n: "8 - темно-синій", c: "#000080" }, { n: "9 - блакитний", c: "#00BFFF" },
+                { n: "10 - фіолетовий", c: "#800080" }, { n: "11 - м'ята", c: "#3EB489" },
+                { n: "12 - червоний", c: "#FF0000" }, { n: "13 - гірчичний", c: "#E1AD01" },
+                { n: "14 - жовтий", c: "#FFD700" }, { n: "14/1 - жовтогарячий", c: "#FF8C00" },
+                { n: "15 - сірий", c: "#808080" }, { n: "17 - темно-сірий", c: "#4F4F4F" },
+                { n: "18 - вино", c: "#722F37" }, { n: "19 - блакитний світлий", c: "#ADD8E6" },
+                { n: "20 - білий", c: "#FFFFFF" }, { n: "21 - рожевий пиловий", c: "#C08081" },
+                { n: "22 - оранжевий", c: "#FFA500" }, { n: "26 - салат", c: "#7CFC00" },
+                { n: "27 - бузок", c: "#C8A2C8" }, { n: "28 - темно-зелений", c: "#006400" },
+                { n: "29 - хакі", c: "#C3B091" }, { n: "30 - чорний", c: "#000000" },
+                { n: "32 - рожевий (Барбі)", c: "#DA1884" }
             ],
-            eco: [{ n: "ЕК3 Чорний", c: "#1a1a1a", active: true }, { n: "ЕК19 Білий", c: "#ffffff", active: true }],
+            eco: [{ n: "ЕК3 Чорний", c: "#1a1a1a" }, { n: "ЕК19 Білий", c: "#ffffff" }],
             velur: [
-                { n: "Багіра 14 (Rose)", c: "#d3a3b1", active: true }, { n: "Багіра 19 (Opal)", c: "#8e8e91", active: true },
-                { n: "Багіра 20 (Ash)", c: "#3c3f4a", active: true }, { n: "Жасмін 02 (Beige)", c: "#e5ddd3", active: true },
-                { n: "Жасмін 91 (Grey)", c: "#9c9ba0", active: true }, { n: "Жасмін 95 (Dark Grey)", c: "#5a5b5d", active: true },
-                { n: "Жасмін 100 (Black)", c: "#1d1d1b", active: true }
+                { n: "Багіра 14 (Rose)", c: "#d3a3b1" }, { n: "Багіра 19 (Opal)", c: "#8e8e91" },
+                { n: "Багіра 20 (Ash)", c: "#3c3f4a" }, { n: "Жасмін 02 (Beige)", c: "#e5ddd3" },
+                { n: "Жасмін 91 (Grey)", c: "#9c9ba0" }, { n: "Жасмін 95 (Dark Grey)", c: "#5a5b5d" },
+                { n: "Жасмін 100 (Black)", c: "#1d1d1b" }
             ]
         };
 
@@ -124,7 +124,7 @@
                     html += `<div class="product-card">
                         <img src="images/${p.img}" onerror="this.src='https://via.placeholder.com/200'">
                         <h3>${p.name}</h3>
-                        <div class="price-tag">${p.base || p.xl} грн</div>
+                        <div class="price-tag">від ${p.base || p.xl} грн</div>
                         <button class="btn-select" onclick="openProduct('${p.id}')">Вибрати</button>
                     </div>`;
                 });
@@ -137,17 +137,26 @@
             currentP = products.find(x => x.id === id);
             const modalBody = document.getElementById('modal-body');
             
+            // Надійне визначення типу товару (шукаємо в назві ТА категорії)
             const nameL = currentP.name.toLowerCase();
-            const isSwing = nameL.includes('гойдалка') || nameL.includes('качеля');
-            const isFuton = nameL.includes('футон');
-            const isBall = nameL.includes('мяч') || nameL.includes('м\'яч');
-            const isDouble = nameL.includes('двомісна') || nameL.includes('двухместная');
-            
+            const catL = currentP.cat.toLowerCase();
+            const isSwing = /гойдалка|качеля/i.test(nameL) || /гойдалка|качеля/i.test(catL);
+            const isFuton = /футон/i.test(nameL) || /футон/i.test(catL);
+            const isBall = /мяч/i.test(nameL) || /мяч/i.test(catL);
+            const isDouble = nameL.includes('двомісна') || nameL.includes('двухместная') || catL.includes('двомісна') || catL.includes('двухместная');
+
+            // Налаштування текстів
             let comboLabel = "Комбінація кольорів (Вставка)";
             let secondColorLabel = "Другий колір (Вставка)";
 
-            if (isSwing) comboLabel = "Комбінація кольорів подушки";
-            if (isFuton) secondColorLabel = "Другий колір (Верх)";
+            if (isSwing) {
+                comboLabel = "Комбінація кольорів подушки";
+                secondColorLabel = "Другий колір (Подушка)";
+            }
+            if (isFuton) {
+                secondColorLabel = "Другий колір (Верх)";
+                comboLabel = "Комбінація кольорів (Верх/Низ)";
+            }
 
             let fabricOptions = `<option value="oxford">Оксфорд (600D)</option>`;
             if (currentP.velurPrice > 0) fabricOptions += `<option value="velur">Велюр (+${currentP.velurPrice} грн)</option>`;
@@ -167,11 +176,11 @@
                     <select id="select-color" onchange="styleSelect(this)"></select>
                 </div>
 
-                <div id="combo-options-area">
-                    ${currentP.comboPrice > 0 || isBall ? `
+                <div id="dynamic-checks">
+                    ${(currentP.comboPrice > 0 || isBall || isSwing) ? `
                         <div class="check-item" onclick="handleSpecialOptions('combo')">
                             <input type="checkbox" id="check-combo">
-                            <span>${comboLabel} (+${currentP.comboPrice} грн)</span>
+                            <span>${comboLabel} (+${currentP.comboPrice || 0} грн)</span>
                         </div>
                     ` : ''}
 
@@ -184,7 +193,7 @@
                 </div>
 
                 <div id="second-color-box" style="display:none;" class="option-group">
-                    <span class="option-label">${secondColorLabel}:</span>
+                    <span class="option-label" id="label-second-color">${secondColorLabel}:</span>
                     <select id="select-color-2" onchange="styleSelect(this)"></select>
                 </div>
 
@@ -231,8 +240,8 @@
             }
 
             if (box2) {
-                const showBox = (combo && combo.checked) || (diff && diff.checked);
-                box2.style.display = showBox ? 'block' : 'none';
+                const isShown = (combo && combo.checked) || (diff && diff.checked);
+                box2.style.display = isShown ? 'block' : 'none';
             }
             calcTotal();
         }
@@ -252,7 +261,7 @@
 
         function updateColors() {
             const fabricKey = document.getElementById('select-fabric').value;
-            const colors = COLOR_DATABASE[fabricKey].filter(col => col.active);
+            const colors = COLOR_DATABASE[fabricKey];
             const fill = (el) => {
                 if (!el) return;
                 el.innerHTML = "";
@@ -293,11 +302,13 @@
             if (fabric === 'eco') itemPrice += currentP.ecoPrice;
             
             if (document.getElementById('check-inner')?.checked) itemPrice += currentP.innerPrice;
-            if (document.getElementById('check-combo')?.checked) itemPrice += currentP.comboPrice;
+            if (document.getElementById('check-combo')?.checked) itemPrice += (currentP.comboPrice || 0);
             
             const diff = document.getElementById('check-diff-color');
             if (diff && diff.checked) {
-                const isDouble = currentP.name.toLowerCase().includes('двомісна') || currentP.name.toLowerCase().includes('двухместная');
+                const nameL = currentP.name.toLowerCase();
+                const catL = currentP.cat.toLowerCase();
+                const isDouble = nameL.includes('двомісна') || nameL.includes('двухместная') || catL.includes('двомісна') || catL.includes('двухместная');
                 itemPrice += isDouble ? 240 : 150;
             }
 
@@ -315,6 +326,7 @@
             
             let addons = [];
             if (document.getElementById('check-inner')?.checked) addons.push("Внутр. чохол");
+            if (isCombo) addons.push("Комбінація кольорів");
             if (isDiff) addons.push("Подушка іншого кольору");
             
             const total = document.getElementById('total-price').innerText;

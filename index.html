@@ -50,30 +50,43 @@
         </div>
     </header>
 
-    <div id="catalog-container">Завантаження меню...</div>
+    <div id="catalog-container">Завантаження...</div>
 
     <script>
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/1Kd4ODQgS8QOFHOg2k4lCvRgizqSRnY17qiaStmV6BNY/export?format=csv&gid=415679695';
 
-        // ПРАВИЛЬНІ КОЛЬОРИ ОКСФОРДА (Згідно з твоїм списком)
+        // ТОЧНИЙ СПИСОК КОЛЬОРІВ ОКСФОРД
         const COLOR_DATABASE = {
             oxford: [
-                { n: "1 - Світло-сірий", c: "#D3D3D3", active: true },
-                { n: "2 - Коричневий", c: "#4B2D0E", active: true },
-                { n: "3 - Какао", c: "#A38A75", active: true },
-                { n: "4 - Бордовий", c: "#800000", active: true },
-                { n: "5 - Червоний", c: "#FF0000", active: true },
-                { n: "6 - Темно-синій", c: "#000080", active: true },
-                { n: "7 - Чорний", c: "#000000", active: true },
-                { n: "8 - Помаранчевий", c: "#FF8C00", active: true },
-                { n: "9 - Жовтий", c: "#FFD700", active: true },
-                { n: "10 - Темно-зелений", c: "#006400", active: true },
-                { n: "11 - Салатовий", c: "#7CFC00", active: true },
-                { n: "12 - Фіолетовий", c: "#800080", active: true },
-                { n: "13 - Блакитний", c: "#00BFFF", active: true },
-                { n: "14 - Сірий", c: "#808080", active: true },
-                { n: "15 - Бежевий", c: "#F5F5DC", active: true },
-                { n: "16 - Рожевий", c: "#FFC0CB", active: true }
+                { n: "2 - коричневий", c: "#4B2D0E", active: true },
+                { n: "3 - какао", c: "#A38A75", active: true },
+                { n: "4 - бежевий", c: "#F5F5DC", active: true },
+                { n: "4/1 - пісочний", c: "#C2B280", active: true },
+                { n: "4/2 - пудровий", c: "#DEB887", active: true },
+                { n: "5 - електрик", c: "#0000FF", active: true },
+                { n: "6 - трава", c: "#008000", active: true },
+                { n: "7 - малина", c: "#E30B5D", active: true },
+                { n: "8 - темно-синій", c: "#000080", active: true },
+                { n: "9 - блакитний", c: "#00BFFF", active: true },
+                { n: "10 - фіолетовий", c: "#800080", active: true },
+                { n: "11 - м'ята", c: "#3EB489", active: true },
+                { n: "12 - червоний", c: "#FF0000", active: true },
+                { n: "13 - гірчичний", c: "#E1AD01", active: true },
+                { n: "14 - жовтий", c: "#FFD700", active: true },
+                { n: "14/1 - жовтогарячий", c: "#FF8C00", active: true },
+                { n: "15 - сірий", c: "#808080", active: true },
+                { n: "17 - темно-сірий", c: "#4F4F4F", active: true },
+                { n: "18 - вино", c: "#722F37", active: true },
+                { n: "19 - блакитний світлий", c: "#ADD8E6", active: true },
+                { n: "20 - білий", c: "#FFFFFF", active: true },
+                { n: "21 - рожевий пиловий", c: "#C08081", active: true },
+                { n: "22 - оранжевий", c: "#FFA500", active: true },
+                { n: "26 - салат", c: "#7CFC00", active: true },
+                { n: "27 - бузок", c: "#C8A2C8", active: true },
+                { n: "28 - темно-зелений", c: "#006400", active: true },
+                { n: "29 - хакі", c: "#C3B091", active: true },
+                { n: "30 - чорний", c: "#000000", active: true },
+                { n: "32 - рожевий (Барбі)", c: "#DA1884", active: true }
             ],
             eco: [
                 { n: "ЕК3 Чорний", c: "#1a1a1a", active: true },
@@ -108,8 +121,8 @@
                     return {
                         id: c[0], cat: c[1], name: name, img: c[3], 
                         base: num(c[4]), xl: num(c[5]),
-                        velurPrice: num(c[9]), 
-                        hasEco: c[11]?.toLowerCase() === 'yes'
+                        velurPrice: num(c[9]), // Колонка J
+                        ecoPrice: num(c[11])   // Колонка L
                     };
                 }).filter(p => p.id);
 
@@ -126,9 +139,7 @@
             products.forEach(p => { if (!grouped[p.cat]) grouped[p.cat] = []; grouped[p.cat].push(p); });
 
             Object.keys(grouped).forEach(cat => {
-                // Видаляємо апостроф з ID, щоб кнопка працювала
                 const safeId = "cat-" + cat.replace(/\s+/g, '-').replace(/'/g, '');
-                
                 menu.innerHTML += `<button onclick="document.getElementById('${safeId}').scrollIntoView({behavior:'smooth', block:'center'})">${cat}</button>`;
                 
                 let html = `<section id="${safeId}"><h2 class="category-title">--- ${cat} ---</h2><div class="product-grid">`;
@@ -151,7 +162,7 @@
             
             let fabricOptions = `<option value="oxford">Оксфорд (600D)</option>`;
             if (currentP.velurPrice > 0) fabricOptions += `<option value="velur">Велюр (+${currentP.velurPrice} грн)</option>`;
-            if (currentP.hasEco) fabricOptions += `<option value="eco">Екошкіра (+350 грн)</option>`;
+            if (currentP.ecoPrice > 0) fabricOptions += `<option value="eco">Екошкіра (+${currentP.ecoPrice} грн)</option>`;
 
             modalBody.innerHTML = `
                 <img src="images/${currentP.img}" style="width:100%; border-radius:15px; margin-bottom:15px; max-height:180px; object-fit:contain;">
@@ -173,7 +184,7 @@
                 </div>
                 
                 <button class="btn-order" onclick="sendToTelegram()">📱 Замовити у Telegram</button>
-                <button onclick="closeM()" style="width:100%; padding:10px; background:none; border:none; color:#999; margin-top:10px; font-size:13px;">Повернутись</button>
+                <button onclick="closeM()" style="width:100%; padding:10px; background:none; border:none; color:#999; margin-top:10px; font-size:13px;">Назад</button>
             `;
             document.getElementById('modal').style.display = 'flex';
             updateColors();
@@ -208,14 +219,14 @@
         function isDark(color) {
             const rgb = parseInt(color.substring(1), 16);
             const r = (rgb >> 16) & 0xff, g = (rgb >> 8) & 0xff, b = (rgb >> 0) & 0xff;
-            return (0.2126 * r + 0.7152 * g + 0.0722 * b) < 120;
+            return (0.2126 * r + 0.7152 * g + 0.0722 * b) < 130;
         }
 
         function calcTotal() {
             const fabricKey = document.getElementById('select-fabric').value;
             let extra = 0;
             if (fabricKey === 'velur') extra = currentP.velurPrice;
-            if (fabricKey === 'eco') extra = 350;
+            if (fabricKey === 'eco') extra = currentP.ecoPrice;
             document.getElementById('total-price').innerText = ((currentP.base || currentP.xl) + extra) + " грн";
         }
 
@@ -223,8 +234,7 @@
             const fabric = document.getElementById('select-fabric').options[document.getElementById('select-fabric').selectedIndex].text;
             const color = document.getElementById('select-color').value;
             const price = document.getElementById('total-price').innerText;
-            const text = `🛒 НОВЕ ЗАМОВЛЕННЯ\n—\nВиріб: ${currentP.name}\nТканина: ${fabric}\nКолір: ${color}\nСума: ${price}`;
-            // ЗАМІНИ 'ТвійНікнейм' на свій нік у Telegram або ID бота
+            const text = `🛒 ЗАМОВЛЕННЯ\n—\nВиріб: ${currentP.name}\nТканина: ${fabric}\nКолір: ${color}\nСума: ${price}`;
             window.location.href = `https://t.me/ComfortPlusManager?text=${encodeURIComponent(text)}`;
         }
 

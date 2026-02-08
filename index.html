@@ -13,8 +13,19 @@
         h1 { font-size: 18px; margin: 0 0 15px; font-weight: 700; color: #222; }
 
         .menu-wrapper { position: relative; background: white; border-top: 1px solid #eee; overflow: hidden; }
-        .category-menu { display: flex; overflow-x: auto; gap: 8px; padding: 12px 15px; scrollbar-width: none; cursor: grab; }
-        .category-menu button { white-space: nowrap; padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; transition: 0.2s; }
+        /* Покращене меню для ПК */
+        .category-menu { 
+            display: flex; 
+            overflow-x: auto; 
+            gap: 8px; 
+            padding: 12px 15px; 
+            scrollbar-width: none; 
+            cursor: grab;
+            -webkit-overflow-scrolling: touch;
+        }
+        .category-menu::-webkit-scrollbar { display: none; }
+        .category-menu:active { cursor: grabbing; }
+        .category-menu button { white-space: nowrap; padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; transition: 0.2s; pointer-events: auto; }
 
         #catalog-container { padding: 15px; max-width: 1000px; margin: 0 auto; }
         .category-title { text-align: center; margin: 40px 0 20px; font-size: 17px; font-weight: 800; text-transform: uppercase; color: #555; }
@@ -37,7 +48,6 @@
         .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid #eee; font-size: 13px; font-weight: 600; }
         .check-item input { width: 18px; height: 18px; pointer-events: none; }
 
-        /* Quantity Input */
         .qty-box { display: flex; align-items: center; background: #f0f0f0; border-radius: 10px; padding: 5px; width: fit-content; margin: 10px 0; }
         .qty-btn { width: 40px; height: 40px; border: none; background: white; border-radius: 8px; font-size: 20px; font-weight: 700; cursor: pointer; color: var(--primary); }
         .qty-input { width: 70px; border: none; background: transparent; text-align: center; font-size: 18px; font-weight: 800; color: #333; outline: none; }
@@ -91,6 +101,17 @@
         let products = [];
         let currentP = null;
 
+        // Скрипт для прокрутки меню мишкою на ПК
+        function initScroll() {
+            const slider = document.querySelector('.category-menu');
+            let isDown = false; let startX; let scrollLeft;
+            slider.addEventListener('mousedown', (e) => { isDown = true; slider.classList.add('active'); startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
+            slider.addEventListener('mouseleave', () => { isDown = false; });
+            slider.addEventListener('mouseup', () => { isDown = false; });
+            slider.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 2; slider.scrollLeft = scrollLeft - walk; });
+            slider.addEventListener('wheel', (e) => { if (e.deltaY !== 0) { e.preventDefault(); slider.scrollLeft += e.deltaY; } });
+        }
+
         async function init() {
             try {
                 const res = await fetch(CSV_URL);
@@ -102,10 +123,12 @@
                     return {
                         id: c[0], cat: c[1], name: c[2], 
                         img: c[3], base: num(c[4]), xl: num(c[5]),
-                        velurPrice: num(c[9]), innerPrice: num(c[10]), ecoPrice: num(c[11]), comboPrice: num(c[12])
+                        velurPrice: num(c[9]), innerPrice: num(c[10]), ecoPrice: num(c[11]), comboPrice: num(c[12]),
+                        diffPrice: num(c[13]) // Ціна з колонки M
                     };
                 }).filter(p => p.id);
                 render();
+                initScroll();
             } catch (e) { console.error(e); }
         }
 
@@ -137,15 +160,14 @@
             currentP = products.find(x => x.id === id);
             const modalBody = document.getElementById('modal-body');
             
-            // Надійне визначення типу товару (шукаємо в назві ТА категорії)
             const nameL = currentP.name.toLowerCase();
             const catL = currentP.cat.toLowerCase();
-            const isSwing = /гойдалка|качеля/i.test(nameL) || /гойдалка|качеля/i.test(catL);
-            const isFuton = /футон/i.test(nameL) || /футон/i.test(catL);
-            const isBall = /мяч/i.test(nameL) || /мяч/i.test(catL);
-            const isDouble = nameL.includes('двомісна') || nameL.includes('двухместная') || catL.includes('двомісна') || catL.includes('двухместная');
+            
+            // Покращена перевірка категорії (враховуємо ваші "Гойдалки")
+            const isSwing = catL.includes('гойд') || catL.includes('кач') || nameL.includes('гойд') || nameL.includes('кач');
+            const isFuton = catL.includes('футон') || nameL.includes('футон');
+            const isBall = nameL.includes('мяч');
 
-            // Налаштування текстів
             let comboLabel = "Комбінація кольорів (Вставка)";
             let secondColorLabel = "Другий колір (Вставка)";
 
@@ -154,8 +176,8 @@
                 secondColorLabel = "Другий колір (Подушка)";
             }
             if (isFuton) {
-                secondColorLabel = "Другий колір (Верх)";
                 comboLabel = "Комбінація кольорів (Верх/Низ)";
+                secondColorLabel = "Другий колір (Верх)";
             }
 
             let fabricOptions = `<option value="oxford">Оксфорд (600D)</option>`;
@@ -184,10 +206,10 @@
                         </div>
                     ` : ''}
 
-                    ${isSwing ? `
+                    ${(isSwing || currentP.diffPrice > 0) ? `
                         <div class="check-item" onclick="handleSpecialOptions('diff')">
                             <input type="checkbox" id="check-diff-color">
-                            <span>Подушка іншого кольору (+${isDouble ? 240 : 150} грн)</span>
+                            <span>Подушка іншого кольору (+${currentP.diffPrice || 150} грн)</span>
                         </div>
                     ` : ''}
                 </div>
@@ -303,14 +325,7 @@
             
             if (document.getElementById('check-inner')?.checked) itemPrice += currentP.innerPrice;
             if (document.getElementById('check-combo')?.checked) itemPrice += (currentP.comboPrice || 0);
-            
-            const diff = document.getElementById('check-diff-color');
-            if (diff && diff.checked) {
-                const nameL = currentP.name.toLowerCase();
-                const catL = currentP.cat.toLowerCase();
-                const isDouble = nameL.includes('двомісна') || nameL.includes('двухместная') || catL.includes('двомісна') || catL.includes('двухместная');
-                itemPrice += isDouble ? 240 : 150;
-            }
+            if (document.getElementById('check-diff-color')?.checked) itemPrice += (currentP.diffPrice || 150);
 
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
             document.getElementById('total-price').innerText = (itemPrice * qty) + " грн";

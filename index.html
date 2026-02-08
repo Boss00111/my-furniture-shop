@@ -35,7 +35,7 @@
         
         .option-group { margin-bottom: 12px; text-align: left; }
         .option-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; margin-bottom: 6px; display: block; }
-        select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #eee; font-size: 14px; font-weight: 600; background: #fafafa; cursor: pointer; margin-bottom: 5px; }
+        select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #eee; font-size: 14px; font-weight: 600; background: #fafafa; cursor: pointer; }
         
         .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid #eee; font-size: 13px; font-weight: 600; }
         .check-item input { width: 18px; height: 18px; pointer-events: none; }
@@ -112,7 +112,7 @@
                     const num = (v) => parseFloat(v?.replace(',', '.')) || 0;
                     return {
                         id: c[0], cat: c[1], name: c[2], img: c[3], 
-                        l: num(c[4]), xl: num(c[5]), xxl: num(c[6]), xxxl: num(c[7]), // Розміри з колонок E, F, G, H
+                        l: num(c[4]), xl: num(c[5]), xxl: num(c[6]), xxxl: num(c[7]),
                         velurPrice: num(c[9]), innerPrice: num(c[10]), ecoPrice: num(c[11]), diffPrice: num(c[12])
                     };
                 }).filter(p => p.id);
@@ -145,6 +145,32 @@
             createModal();
         }
 
+        function getSizeLabel(key, p) {
+            const nl = p.name.toLowerCase();
+            const cl = p.cat.toLowerCase();
+            const isSwing = cl.includes('гойд') || cl.includes('кач') || nl.includes('гойд') || nl.includes('кач');
+            const isFuton = cl.includes('футон') || nl.includes('футон');
+
+            if (isSwing) {
+                const isDouble = nl.includes('двом') || nl.includes('2-м');
+                if (isDouble) {
+                    if (key === 'l') return 'L (120х80 см)';
+                    if (key === 'xl') return 'XL (150х80 см)';
+                    if (key === 'xxl') return 'XXL (180х90 см)';
+                } else {
+                    if (key === 'l') return 'L (80см)';
+                    if (key === 'xl') return 'XL (95см)';
+                }
+            }
+            if (isFuton) {
+                if (key === 'l') return 'L (160х80 см)';
+                if (key === 'xl') return 'XL (180х100 см)';
+            }
+            // Стандарт для крісел
+            const labels = { l: 'L (85х65 см)', xl: 'XL (105х85 см)', xxl: '2XL (130х90 см)', xxxl: '3XL (140х100 см)' };
+            return labels[key] || key.toUpperCase();
+        }
+
         function openProduct(id) {
             currentP = products.find(x => x.id === id);
             const modalBody = document.getElementById('modal-body');
@@ -153,13 +179,14 @@
             
             const isSwing = cl.includes('гойд') || cl.includes('кач') || nl.includes('гойд') || nl.includes('кач');
             const isFuton = cl.includes('футон') || nl.includes('футон');
-            
-            // Динамічні розміри
+
             let sizeOptions = "";
-            if (currentP.l > 0) sizeOptions += `<option value="l">L (85х65 см)</option>`;
-            if (currentP.xl > 0) sizeOptions += `<option value="xl" selected>XL (105х85 см)</option>`;
-            if (currentP.xxl > 0) sizeOptions += `<option value="xxl">2XL (130х90 см)</option>`;
-            if (currentP.xxxl > 0) sizeOptions += `<option value="xxxl">3XL (140х100 см)</option>`;
+            ['l', 'xl', 'xxl', 'xxxl'].forEach(key => {
+                if (currentP[key] > 0) {
+                    const label = getSizeLabel(key, currentP);
+                    sizeOptions += `<option value="${key}" ${key === 'xl' ? 'selected' : ''}>${label}</option>`;
+                }
+            });
 
             let comboLabel = "Комбінація кольорів (Вставка)";
             let secondColorLabel = "Другий колір (Вставка)";
@@ -173,12 +200,9 @@
             modalBody.innerHTML = `
                 <img src="images/${currentP.img}" style="width:100%; border-radius:15px; margin-bottom:10px; max-height:160px; object-fit:contain;">
                 <h2 style="margin:0 0 10px; font-size:16px;">${currentP.name}</h2>
-                
                 ${sizeOptions ? `<div class="option-group"><span class="option-label">Розмір:</span><select id="select-size" onchange="calcTotal()">${sizeOptions}</select></div>` : ''}
-                
                 <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()">${fabricOptions}</select></div>
                 <div class="option-group"><span class="option-label">Основний колір:</span><select id="select-color" onchange="styleSelect(this)"></select></div>
-
                 <div id="dynamic-checks">
                     ${(currentP.diffPrice > 0 || isSwing) ? `
                         <div class="check-item" onclick="handleSpecialOptions('combo')">
@@ -193,19 +217,15 @@
                         </div>
                     ` : ''}
                 </div>
-
                 <div id="second-color-box" style="display:none;" class="option-group">
                     <span class="option-label">${secondColorLabel}:</span>
                     <select id="select-color-2" onchange="styleSelect(this)"></select>
                 </div>
-
                 ${currentP.innerPrice > 0 ? `<div class="check-item" onclick="toggleSimple('check-inner')"><input type="checkbox" id="check-inner"><span>Внутрішній чохол (+${currentP.innerPrice} грн)</span></div>` : ''}
-
                 <div class="option-group">
                     <span class="option-label">Кількість:</span>
                     <div class="qty-box"><button class="qty-btn" onclick="adjustQty(-1)">-</button><input type="number" id="qty-input" class="qty-input" value="1" min="1" oninput="calcTotal()"><button class="qty-btn" onclick="adjustQty(1)">+</button></div>
                 </div>
-
                 <div class="total-box"><span>Разом:</span><span class="total-price" id="total-price">0 грн</span></div>
                 <button class="btn-order" onclick="sendToTelegram()">Замовити у Telegram</button>
                 <button onclick="closeM()" style="width:100%; padding:10px; background:none; border:none; color:#999; margin-top:10px;">Назад</button>
@@ -258,14 +278,12 @@
         function calcTotal() {
             if (!currentP) return;
             const sizeKey = document.getElementById('select-size')?.value || 'l';
-            let p = currentP[sizeKey] || currentP.l;
-            
+            let p = currentP[sizeKey] || 0;
             const fabric = document.getElementById('select-fabric').value;
             if (fabric === 'velur') p += currentP.velurPrice;
             if (fabric === 'eco') p += currentP.ecoPrice;
             if (document.getElementById('check-inner')?.checked) p += currentP.innerPrice;
             if (document.getElementById('check-combo')?.checked || document.getElementById('check-diff-color')?.checked) p += currentP.diffPrice;
-            
             const qty = parseInt(document.getElementById('qty-input').value) || 1;
             document.getElementById('total-price').innerText = (p * qty) + " грн";
         }
@@ -273,7 +291,7 @@
         function sendToTelegram() {
             const qty = document.getElementById('qty-input').value;
             const sizeEl = document.getElementById('select-size');
-            const size = sizeEl ? `\nРозмір: ${sizeEl.options[sizeEl.selectedIndex].text}` : '';
+            const sizeText = sizeEl ? `\nРозмір: ${sizeEl.options[sizeEl.selectedIndex].text}` : '';
             const fabric = document.getElementById('select-fabric').options[document.getElementById('select-fabric').selectedIndex].text;
             const color1 = document.getElementById('select-color').value;
             const isCombo = document.getElementById('check-combo')?.checked;
@@ -283,8 +301,7 @@
             if (document.getElementById('check-inner')?.checked) adds.push("Внутр. чохол");
             if (isCombo) adds.push("Комбінація");
             if (isDiff) adds.push("Інша подушка");
-            
-            const text = `🛒 ЗАМОВЛЕННЯ (${qty} шт)\n—\nВиріб: ${currentP.name}${size}\nТканина: ${fabric}\nКолір: ${color1}${color2}\nДодатки: ${adds.length ? adds.join(', ') : 'немає'}\nСума: ${document.getElementById('total-price').innerText}`;
+            const text = `🛒 ЗАМОВЛЕННЯ (${qty} шт)\n—\nВиріб: ${currentP.name}${sizeText}\nТканина: ${fabric}\nКолір: ${color1}${color2}\nДодатки: ${adds.length ? adds.join(', ') : 'немає'}\nСума: ${document.getElementById('total-price').innerText}`;
             window.location.href = `https://t.me/ComfortPlusManager?text=${encodeURIComponent(text)}`;
         }
 

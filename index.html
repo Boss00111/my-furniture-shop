@@ -14,8 +14,7 @@
 
         .menu-wrapper { position: relative; background: white; border-top: 1px solid #eee; overflow: hidden; }
         .category-menu { display: flex; overflow-x: auto; gap: 8px; padding: 12px 15px; scrollbar-width: none; cursor: grab; }
-        .category-menu::-webkit-scrollbar { display: none; }
-        .category-menu button { white-space: nowrap; padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+        .category-menu button { white-space: nowrap; padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; transition: 0.2s; }
 
         #catalog-container { padding: 15px; max-width: 1000px; margin: 0 auto; }
         .category-title { text-align: center; margin: 40px 0 20px; font-size: 17px; font-weight: 800; text-transform: uppercase; color: #555; }
@@ -28,20 +27,20 @@
         .btn-select { background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: flex-end; }
-        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; max-height: 95vh; overflow-y: auto; }
         
         .option-group { margin-bottom: 12px; text-align: left; }
         .option-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; margin-bottom: 6px; display: block; }
         
         select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #eee; font-size: 14px; font-weight: 600; background: #fafafa; cursor: pointer; }
         
-        .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; border: 1px solid #eee; font-size: 13px; font-weight: 600; }
+        .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; border: 1px solid #eee; font-size: 13px; font-weight: 600; transition: 0.2s; }
         .check-item input { width: 18px; height: 18px; pointer-events: none; }
 
-        /* Quantity Stepper */
-        .qty-box { display: flex; align-items: center; justify-content: space-between; background: #f0f0f0; border-radius: 10px; padding: 5px; width: 120px; margin: 10px 0; }
-        .qty-btn { width: 35px; height: 35px; border: none; background: white; border-radius: 8px; font-size: 20px; font-weight: 700; cursor: pointer; color: var(--primary); }
-        .qty-val { font-weight: 700; font-size: 16px; }
+        /* Quantity Input Style */
+        .qty-box { display: flex; align-items: center; background: #f0f0f0; border-radius: 10px; padding: 5px; width: fit-content; margin: 10px 0; }
+        .qty-btn { width: 40px; height: 40px; border: none; background: white; border-radius: 8px; font-size: 20px; font-weight: 700; cursor: pointer; color: var(--primary); }
+        .qty-input { width: 60px; border: none; background: transparent; text-align: center; font-size: 18px; font-weight: 800; color: #333; outline: none; }
 
         .total-box { background: #eef8ff; padding: 15px; border-radius: 12px; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #cce5ff; }
         .total-price { font-size: 20px; font-weight: 800; color: var(--primary); }
@@ -91,7 +90,6 @@
 
         let products = [];
         let currentP = null;
-        let orderQty = 1;
 
         async function init() {
             try {
@@ -102,13 +100,12 @@
                     const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/"/g, '').trim());
                     const num = (v) => parseFloat(v?.replace(',', '.')) || 0;
                     return {
-                        id: c[0], cat: c[1], name: c[2].replace('Кресло','Крісло').replace('Двухместная','Двомісна'), 
+                        id: c[0], cat: c[1], name: c[2], 
                         img: c[3], base: num(c[4]), xl: num(c[5]),
                         velurPrice: num(c[9]), innerPrice: num(c[10]), ecoPrice: num(c[11]), comboPrice: num(c[12])
                     };
                 }).filter(p => p.id);
                 render();
-                setupDragScroll();
             } catch (e) { console.error(e); }
         }
 
@@ -138,23 +135,26 @@
 
         function openProduct(id) {
             currentP = products.find(x => x.id === id);
-            orderQty = 1;
             const modalBody = document.getElementById('modal-body');
             
-            const isSwing = currentP.name.toLowerCase().includes('гойдалка');
-            const isFuton = currentP.name.toLowerCase().includes('футон');
-            const isDouble = currentP.name.toLowerCase().includes('двомісна');
+            const nameL = currentP.name.toLowerCase();
+            const isSwing = nameL.includes('гойдалка') || nameL.includes('качеля');
+            const isFuton = nameL.includes('футон');
+            const isBall = nameL.includes('мяч') || nameL.includes('м\'яч');
+            const isDouble = nameL.includes('двомісна') || nameL.includes('двухместная');
             
-            const comboLabel = isSwing ? "Комбінація кольорів подушки" : "Комбінація кольорів";
-            const secondColorLabel = isFuton ? "Другий колір (Верх)" : "Другий колір";
-            const diffColorPrice = isDouble ? 240 : 150;
+            let comboLabel = "Комбінація кольорів (Вставка)";
+            let secondColorLabel = "Другий колір (Вставка)";
+
+            if (isSwing) comboLabel = "Комбінація кольорів подушки";
+            if (isFuton) secondColorLabel = "Другий колір (Верх)";
 
             let fabricOptions = `<option value="oxford">Оксфорд (600D)</option>`;
             if (currentP.velurPrice > 0) fabricOptions += `<option value="velur">Велюр (+${currentP.velurPrice} грн)</option>`;
             if (currentP.ecoPrice > 0) fabricOptions += `<option value="eco">Екошкіра (+${currentP.ecoPrice} грн)</option>`;
 
             modalBody.innerHTML = `
-                <img src="images/${currentP.img}" style="width:100%; border-radius:15px; margin-bottom:15px; max-height:180px; object-fit:contain;">
+                <img src="images/${currentP.img}" style="width:100%; border-radius:15px; margin-bottom:10px; max-height:160px; object-fit:contain;">
                 <h2 style="margin:0 0 10px; font-size:16px;">${currentP.name}</h2>
                 
                 <div class="option-group">
@@ -167,19 +167,21 @@
                     <select id="select-color" onchange="styleSelect(this)"></select>
                 </div>
 
-                <div id="combo-section" style="display:none;">
-                    <div class="check-item" onclick="handleSwingOptions('combo')">
-                        <input type="checkbox" id="check-combo">
-                        <span>${comboLabel} (+${currentP.comboPrice} грн)</span>
-                    </div>
-                </div>
+                <div id="combo-options-area">
+                    ${currentP.comboPrice > 0 || isBall ? `
+                        <div class="check-item" onclick="handleSpecialOptions('combo')">
+                            <input type="checkbox" id="check-combo">
+                            <span>${comboLabel} (+${currentP.comboPrice} грн)</span>
+                        </div>
+                    ` : ''}
 
-                ${isSwing ? `
-                    <div class="check-item" onclick="handleSwingOptions('diff')">
-                        <input type="checkbox" id="check-diff-color">
-                        <span>Подушка іншого кольору (+${diffColorPrice} грн)</span>
-                    </div>
-                ` : ''}
+                    ${isSwing ? `
+                        <div class="check-item" onclick="handleSpecialOptions('diff')">
+                            <input type="checkbox" id="check-diff-color">
+                            <span>Подушка іншого кольору (+${isDouble ? 240 : 150} грн)</span>
+                        </div>
+                    ` : ''}
+                </div>
 
                 <div id="second-color-box" style="display:none;" class="option-group">
                     <span class="option-label">${secondColorLabel}:</span>
@@ -187,7 +189,7 @@
                 </div>
 
                 ${currentP.innerPrice > 0 ? `
-                    <div class="check-item" onclick="toggleOption('check-inner')">
+                    <div class="check-item" onclick="toggleSimple('check-inner')">
                         <input type="checkbox" id="check-inner">
                         <span>Внутрішній чохол (+${currentP.innerPrice} грн)</span>
                     </div>
@@ -196,9 +198,9 @@
                 <div class="option-group">
                     <span class="option-label">Кількість:</span>
                     <div class="qty-box">
-                        <button class="qty-btn" onclick="changeQty(-1)">-</button>
-                        <span class="qty-val" id="qty-val">1</span>
-                        <button class="qty-btn" onclick="changeQty(1)">+</button>
+                        <button class="qty-btn" onclick="adjustQty(-1)">-</button>
+                        <input type="number" id="qty-input" class="qty-input" value="1" min="1" oninput="calcTotal()">
+                        <button class="qty-btn" onclick="adjustQty(1)">+</button>
                     </div>
                 </div>
 
@@ -211,37 +213,40 @@
                 <button onclick="closeM()" style="width:100%; padding:10px; background:none; border:none; color:#999; margin-top:10px;">Назад</button>
             `;
             
-            if (currentP.comboPrice > 0) document.getElementById('combo-section').style.display = 'block';
             document.getElementById('modal').style.display = 'flex';
             updateColors();
         }
 
-        function handleSwingOptions(mode) {
+        function handleSpecialOptions(mode) {
             const combo = document.getElementById('check-combo');
             const diff = document.getElementById('check-diff-color');
             const box2 = document.getElementById('second-color-box');
 
-            if (mode === 'combo') {
+            if (mode === 'combo' && combo) {
                 combo.checked = !combo.checked;
                 if (combo.checked && diff) diff.checked = false;
-            } else if (mode === 'diff') {
+            } else if (mode === 'diff' && diff) {
                 diff.checked = !diff.checked;
-                if (diff.checked) combo.checked = false;
+                if (diff.checked && combo) combo.checked = false;
             }
 
-            box2.style.display = (combo.checked || (diff && diff.checked)) ? 'block' : 'none';
+            if (box2) {
+                const showBox = (combo && combo.checked) || (diff && diff.checked);
+                box2.style.display = showBox ? 'block' : 'none';
+            }
             calcTotal();
         }
 
-        function toggleOption(id) {
-            const ch = document.getElementById(id);
-            ch.checked = !ch.checked;
+        function toggleSimple(id) {
+            const el = document.getElementById(id);
+            if (el) el.checked = !el.checked;
             calcTotal();
         }
 
-        function changeQty(delta) {
-            orderQty = Math.max(1, Math.min(100, orderQty + delta));
-            document.getElementById('qty-val').innerText = orderQty;
+        function adjustQty(v) {
+            const input = document.getElementById('qty-input');
+            let val = parseInt(input.value) || 1;
+            input.value = Math.max(1, val + v);
             calcTotal();
         }
 
@@ -249,6 +254,7 @@
             const fabricKey = document.getElementById('select-fabric').value;
             const colors = COLOR_DATABASE[fabricKey].filter(col => col.active);
             const fill = (el) => {
+                if (!el) return;
                 el.innerHTML = "";
                 colors.forEach(col => {
                     const opt = document.createElement('option');
@@ -280,6 +286,7 @@
         }
 
         function calcTotal() {
+            if (!currentP) return;
             let itemPrice = currentP.base || currentP.xl;
             const fabric = document.getElementById('select-fabric').value;
             if (fabric === 'velur') itemPrice += currentP.velurPrice;
@@ -290,34 +297,29 @@
             
             const diff = document.getElementById('check-diff-color');
             if (diff && diff.checked) {
-                itemPrice += currentP.name.toLowerCase().includes('двомісна') ? 240 : 150;
+                const isDouble = currentP.name.toLowerCase().includes('двомісна') || currentP.name.toLowerCase().includes('двухместная');
+                itemPrice += isDouble ? 240 : 150;
             }
 
-            document.getElementById('total-price').innerText = (itemPrice * orderQty) + " грн";
+            const qty = parseInt(document.getElementById('qty-input').value) || 1;
+            document.getElementById('total-price').innerText = (itemPrice * qty) + " грн";
         }
 
         function sendToTelegram() {
+            const qty = document.getElementById('qty-input').value;
             const fabric = document.getElementById('select-fabric').options[document.getElementById('select-fabric').selectedIndex].text;
             const color1 = document.getElementById('select-color').value;
             const isCombo = document.getElementById('check-combo')?.checked;
             const isDiff = document.getElementById('check-diff-color')?.checked;
             const color2 = (isCombo || isDiff) ? ` + ${document.getElementById('select-color-2').value}` : '';
             
-            let addon = document.getElementById('check-inner')?.checked ? ' + Внутр. чохол' : '';
-            if (isDiff) addon += ' (Подушка іншого кольору)';
+            let addons = [];
+            if (document.getElementById('check-inner')?.checked) addons.push("Внутр. чохол");
+            if (isDiff) addons.push("Подушка іншого кольору");
             
             const total = document.getElementById('total-price').innerText;
-            const text = `🛒 ЗАМОВЛЕННЯ (${orderQty} шт)\n—\nВиріб: ${currentP.name}\nТканина: ${fabric}\nКолір: ${color1}${color2}\nДодатки: ${addon || 'немає'}\nСума: ${total}`;
+            const text = `🛒 ЗАМОВЛЕННЯ (${qty} шт)\n—\nВиріб: ${currentP.name}\nТканина: ${fabric}\nКолір: ${color1}${color2}\nДодатки: ${addons.length ? addons.join(', ') : 'немає'}\nСума: ${total}`;
             window.location.href = `https://t.me/ComfortPlusManager?text=${encodeURIComponent(text)}`;
-        }
-
-        function setupDragScroll() {
-            const s = document.querySelector('.category-menu');
-            let isDown = false, startX, scrollLeft;
-            s.onmousedown = (e) => { isDown = true; startX = e.pageX - s.offsetLeft; scrollLeft = s.scrollLeft; };
-            s.onmouseleave = () => isDown = false;
-            s.onmouseup = () => isDown = false;
-            s.onmousemove = (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - s.offsetLeft; s.scrollLeft = scrollLeft - (x - startX)*2; };
         }
 
         function createModal() {

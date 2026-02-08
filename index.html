@@ -3,76 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Comfort Plus | Меблі</title>
+    <title>Comfort Plus Store</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #007bff; --success: #28a745; --bg: #f8f9fa; --text: #333; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
+        :root { --primary: #0088cc; --success: #28a745; --bg: #f4f7f9; --text: #333; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; user-select: none; }
         
         header { background: white; padding: 15px 0 0; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        h1 { font-size: 18px; margin: 0 0 15px; font-weight: 700; }
+        h1 { font-size: 18px; margin: 0 0 15px; font-weight: 700; color: #222; }
 
         .menu-wrapper { position: relative; background: white; border-top: 1px solid #eee; overflow: hidden; }
         .category-menu { display: flex; overflow-x: auto; gap: 8px; padding: 12px 15px; scrollbar-width: none; cursor: grab; }
         .category-menu::-webkit-scrollbar { display: none; }
-        .category-menu button { white-space: nowrap; padding: 10px 20px; border: 1px solid #ddd; border-radius: 25px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+        .category-menu button { white-space: nowrap; padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; transition: 0.2s; }
 
         #catalog-container { padding: 15px; max-width: 1000px; margin: 0 auto; }
-        .category-title { text-align: center; margin: 40px 0 20px; font-size: 18px; font-weight: 800; text-transform: uppercase; color: #444; }
-        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .category-title { text-align: center; margin: 40px 0 20px; font-size: 17px; font-weight: 800; text-transform: uppercase; color: #555; }
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
-        .product-card { background: white; border-radius: 18px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; display: flex; flex-direction: column; }
-        .product-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; }
-        .product-card h3 { font-size: 14px; margin: 12px 0; min-height: 34px; color: #222; }
-        .price-tag { font-weight: 700; color: var(--success); font-size: 16px; margin-bottom: 12px; }
-        .btn-select { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+        .product-card { background: white; border-radius: 15px; padding: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.04); text-align: center; display: flex; flex-direction: column; }
+        .product-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; }
+        .product-card h3 { font-size: 13px; margin: 10px 0; min-height: 32px; color: #222; line-height: 1.2; }
+        .price-tag { font-weight: 700; color: var(--success); font-size: 15px; margin-bottom: 10px; }
+        .btn-select { background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
         /* Модалка */
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: flex-end; }
-        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; padding: 20px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; max-height: 85vh; overflow-y: auto; }
         
-        .option-group { margin-bottom: 15px; text-align: left; }
-        .option-label { font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .option-group { margin-bottom: 12px; text-align: left; }
+        .option-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; margin-bottom: 6px; display: block; }
         
-        select { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #eee; font-size: 15px; font-weight: 600; background: #f9f9f9; transition: 0.3s; cursor: pointer; }
+        select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #eee; font-size: 15px; font-weight: 600; background: #fafafa; cursor: pointer; transition: 0.2s; }
         
-        .total-box { background: #f0f7ff; padding: 15px; border-radius: 15px; margin: 20px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #d0e3ff; }
-        .total-price { font-size: 22px; font-weight: 800; color: var(--primary); }
-        .btn-order { background: var(--success); color: white; border: none; width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(40,167,69,0.3); }
+        .total-box { background: #eef8ff; padding: 15px; border-radius: 12px; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; }
+        .total-price { font-size: 20px; font-weight: 800; color: var(--primary); }
+        .btn-order { background: #0088cc; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🛍️ Comfort Plus | Меблі</h1>
+        <h1>🛍️ Comfort Plus | Store</h1>
         <div class="menu-wrapper">
             <div class="category-menu" id="main-menu"></div>
         </div>
     </header>
 
-    <div id="catalog-container">Завантаження...</div>
+    <div id="catalog-container">Завантаження меню...</div>
 
     <script>
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/1Kd4ODQgS8QOFHOg2k4lCvRgizqSRnY17qiaStmV6BNY/export?format=csv&gid=415679695';
 
-        // --- БАЗА КОЛЬОРІВ ---
-        // Щоб тимчасово прибрати колір, просто постав "active: false"
+        // ПРАВИЛЬНІ КОЛЬОРИ ОКСФОРДА (Згідно з твоїм списком)
         const COLOR_DATABASE = {
             oxford: [
-                { n: "Чорний", c: "#000000", active: true },
-                { n: "Сірий", c: "#808080", active: true },
-                { n: "Темно-синій", c: "#000080", active: true },
-                { n: "Червоний", c: "#FF0000", active: true },
-                { n: "Бордовий", c: "#800000", active: true },
-                { n: "Оранжевий", c: "#FF8C00", active: true },
-                { n: "Жовтий", c: "#FFD700", active: true },
-                { n: "Зелений (Трав'яний)", c: "#008000", active: true },
-                { n: "Темно-зелений", c: "#006400", active: true },
-                { n: "Коричневий", c: "#4B2D0E", active: true },
-                { n: "Бежевий", c: "#F5F5DC", active: true },
-                { n: "Фіолетовий", c: "#800080", active: true },
-                { n: "Салатовий", c: "#7CFC00", active: true },
-                { n: "Блакитний", c: "#00BFFF", active: true }
+                { n: "1 - Світло-сірий", c: "#D3D3D3", active: true },
+                { n: "2 - Коричневий", c: "#4B2D0E", active: true },
+                { n: "3 - Какао", c: "#A38A75", active: true },
+                { n: "4 - Бордовий", c: "#800000", active: true },
+                { n: "5 - Червоний", c: "#FF0000", active: true },
+                { n: "6 - Темно-синій", c: "#000080", active: true },
+                { n: "7 - Чорний", c: "#000000", active: true },
+                { n: "8 - Помаранчевий", c: "#FF8C00", active: true },
+                { n: "9 - Жовтий", c: "#FFD700", active: true },
+                { n: "10 - Темно-зелений", c: "#006400", active: true },
+                { n: "11 - Салатовий", c: "#7CFC00", active: true },
+                { n: "12 - Фіолетовий", c: "#800080", active: true },
+                { n: "13 - Блакитний", c: "#00BFFF", active: true },
+                { n: "14 - Сірий", c: "#808080", active: true },
+                { n: "15 - Бежевий", c: "#F5F5DC", active: true },
+                { n: "16 - Рожевий", c: "#FFC0CB", active: true }
             ],
             eco: [
                 { n: "ЕК3 Чорний", c: "#1a1a1a", active: true },
@@ -89,6 +90,7 @@
             ]
         };
 
+        const translateMap = { "Кресло": "Крісло", "Двухместная": "Двомісна", "Мяч": "М'яч" };
         let products = [];
         let currentP = null;
 
@@ -101,11 +103,13 @@
                 products = rows.map(row => {
                     const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/"/g, '').trim());
                     const num = (v) => parseFloat(v?.replace(',', '.')) || 0;
+                    let name = c[2] || "";
+                    Object.keys(translateMap).forEach(k => name = name.replace(new RegExp(k, "gi"), translateMap[k]));
                     return {
-                        id: c[0], cat: c[1], name: c[2], img: c[3], 
+                        id: c[0], cat: c[1], name: name, img: c[3], 
                         base: num(c[4]), xl: num(c[5]),
-                        velurPrice: num(c[9]), // Доплата за велюр з колонки J
-                        hasEco: c[11]?.toLowerCase() === 'yes' // Доплата за екошкіру (припустимо +350)
+                        velurPrice: num(c[9]), 
+                        hasEco: c[11]?.toLowerCase() === 'yes'
                     };
                 }).filter(p => p.id);
 
@@ -122,15 +126,18 @@
             products.forEach(p => { if (!grouped[p.cat]) grouped[p.cat] = []; grouped[p.cat].push(p); });
 
             Object.keys(grouped).forEach(cat => {
-                const id = "cat-" + cat.replace(/\s+/g, '-');
-                menu.innerHTML += `<button onclick="document.getElementById('${id}').scrollIntoView({behavior:'smooth', block:'center'})">${cat}</button>`;
-                let html = `<section id="${id}"><h2 class="category-title">--- ${cat} ---</h2><div class="product-grid">`;
+                // Видаляємо апостроф з ID, щоб кнопка працювала
+                const safeId = "cat-" + cat.replace(/\s+/g, '-').replace(/'/g, '');
+                
+                menu.innerHTML += `<button onclick="document.getElementById('${safeId}').scrollIntoView({behavior:'smooth', block:'center'})">${cat}</button>`;
+                
+                let html = `<section id="${safeId}"><h2 class="category-title">--- ${cat} ---</h2><div class="product-grid">`;
                 grouped[cat].forEach(p => {
                     html += `<div class="product-card">
                         <img src="images/${p.img}" onerror="this.src='https://via.placeholder.com/200'">
                         <h3>${p.name}</h3>
-                        <div class="price-tag">від ${p.base || p.xl} грн</div>
-                        <button class="btn-select" onclick="openProduct('${p.id}')">Налаштувати</button>
+                        <div class="price-tag">${p.base || p.xl} грн</div>
+                        <button class="btn-select" onclick="openProduct('${p.id}')">Вибрати</button>
                     </div>`;
                 });
                 catalog.innerHTML += html + `</div></section>`;
@@ -147,8 +154,8 @@
             if (currentP.hasEco) fabricOptions += `<option value="eco">Екошкіра (+350 грн)</option>`;
 
             modalBody.innerHTML = `
-                <img src="images/${currentP.img}" style="width:100%; border-radius:15px; margin-bottom:15px; height:200px; object-fit:contain;">
-                <h2 style="margin:0 0 15px; font-size:18px;">${currentP.name}</h2>
+                <img src="images/${currentP.img}" style="width:100%; border-radius:15px; margin-bottom:15px; max-height:180px; object-fit:contain;">
+                <h2 style="margin:0 0 10px; font-size:17px;">${currentP.name}</h2>
                 
                 <div class="option-group">
                     <span class="option-label">Тканина:</span>
@@ -161,12 +168,12 @@
                 </div>
 
                 <div class="total-box">
-                    <span>Разом до сплати:</span>
+                    <span style="font-weight:600">До сплати:</span>
                     <span class="total-price" id="total-price">0 грн</span>
                 </div>
                 
-                <button class="btn-order" onclick="sendOrder()">Замовити у Viber</button>
-                <button onclick="closeM()" style="width:100%; padding:12px; background:none; border:none; color:#888; margin-top:10px; cursor:pointer;">Назад</button>
+                <button class="btn-order" onclick="sendToTelegram()">📱 Замовити у Telegram</button>
+                <button onclick="closeM()" style="width:100%; padding:10px; background:none; border:none; color:#999; margin-top:10px; font-size:13px;">Повернутись</button>
             `;
             document.getElementById('modal').style.display = 'flex';
             updateColors();
@@ -176,41 +183,32 @@
             const fabricKey = document.getElementById('select-fabric').value;
             const colorSelect = document.getElementById('select-color');
             colorSelect.innerHTML = "";
-            
-            // Фільтруємо лише АКТИВНІ кольори
             COLOR_DATABASE[fabricKey].filter(col => col.active).forEach(col => {
                 const opt = document.createElement('option');
                 opt.value = col.n;
                 opt.innerText = col.n;
                 opt.dataset.color = col.c;
                 opt.style.backgroundColor = col.c;
-                // Білий текст для темних фонів
                 if (isDark(col.c)) opt.style.color = "white";
                 colorSelect.appendChild(opt);
             });
             styleColorSelect();
-            calcTotal();
         }
 
         function styleColorSelect() {
             const sel = document.getElementById('select-color');
-            const selectedOption = sel.options[sel.selectedIndex];
-            if (selectedOption) {
-                const bgColor = selectedOption.dataset.color;
-                sel.style.backgroundColor = bgColor;
-                sel.style.color = isDark(bgColor) ? "white" : "black";
+            const opt = sel.options[sel.selectedIndex];
+            if (opt) {
+                sel.style.backgroundColor = opt.dataset.color;
+                sel.style.color = isDark(opt.dataset.color) ? "white" : "black";
             }
             calcTotal();
         }
 
         function isDark(color) {
-            const c = color.substring(1);      // strip #
-            const rgb = parseInt(c, 16);   // convert rrggbb to decimal
-            const r = (rgb >> 16) & 0xff;  // extract red
-            const g = (rgb >>  8) & 0xff;  // extract green
-            const b = (rgb >>  0) & 0xff;  // extract blue
-            const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
-            return luma < 100;
+            const rgb = parseInt(color.substring(1), 16);
+            const r = (rgb >> 16) & 0xff, g = (rgb >> 8) & 0xff, b = (rgb >> 0) & 0xff;
+            return (0.2126 * r + 0.7152 * g + 0.0722 * b) < 120;
         }
 
         function calcTotal() {
@@ -218,17 +216,16 @@
             let extra = 0;
             if (fabricKey === 'velur') extra = currentP.velurPrice;
             if (fabricKey === 'eco') extra = 350;
-
-            const price = (currentP.base || currentP.xl) + extra;
-            document.getElementById('total-price').innerText = price + " грн";
+            document.getElementById('total-price').innerText = ((currentP.base || currentP.xl) + extra) + " грн";
         }
 
-        function sendOrder() {
+        function sendToTelegram() {
             const fabric = document.getElementById('select-fabric').options[document.getElementById('select-fabric').selectedIndex].text;
             const color = document.getElementById('select-color').value;
             const price = document.getElementById('total-price').innerText;
-            const text = `Замовлення: ${currentP.name}. Тканина: ${fabric}, Колір: ${color}. Ціна: ${price}`;
-            window.location.href = `viber://pa?chatURI=ComfortPlus&text=${encodeURIComponent(text)}`;
+            const text = `🛒 НОВЕ ЗАМОВЛЕННЯ\n—\nВиріб: ${currentP.name}\nТканина: ${fabric}\nКолір: ${color}\nСума: ${price}`;
+            // ЗАМІНИ 'ТвійНікнейм' на свій нік у Telegram або ID бота
+            window.location.href = `https://t.me/ComfortPlusManager?text=${encodeURIComponent(text)}`;
         }
 
         function setupDragScroll() {
@@ -237,7 +234,7 @@
             s.onmousedown = (e) => { isDown = true; startX = e.pageX - s.offsetLeft; scrollLeft = s.scrollLeft; };
             s.onmouseleave = () => isDown = false;
             s.onmouseup = () => isDown = false;
-            s.onmousemove = (e) => { if(!isDown) return; const x = e.pageX - s.offsetLeft; s.scrollLeft = scrollLeft - (x - startX)*2; };
+            s.onmousemove = (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - s.offsetLeft; s.scrollLeft = scrollLeft - (x - startX)*2; };
         }
 
         function createModal() {

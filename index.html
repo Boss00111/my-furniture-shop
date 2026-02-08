@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #007bff; --success: #28a745; --bg: #f8f9fa; --text: #333; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
         
         header { background: white; padding: 15px 0 0; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         h1 { font-size: 18px; margin: 0 0 15px; font-weight: 700; }
@@ -27,20 +27,18 @@
         .price-tag { font-weight: 700; color: var(--success); font-size: 16px; margin-bottom: 12px; }
         .btn-select { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
 
-        /* Модалка та Конструктор */
+        /* Модалка */
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: flex-end; }
         .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; padding: 20px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         
         .option-group { margin-bottom: 15px; text-align: left; }
         .option-label { font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; margin-bottom: 8px; display: block; }
         
-        select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 15px; font-family: inherit; outline: none; background: #f9f9f9; }
-        option { padding: 10px; }
-
-        .total-box { background: #f0f7ff; padding: 15px; border-radius: 15px; margin: 20px 0; display: flex; justify-content: space-between; align-items: center; }
-        .total-price { font-size: 22px; font-weight: 800; color: var(--primary); }
+        select { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #eee; font-size: 15px; font-weight: 600; background: #f9f9f9; transition: 0.3s; cursor: pointer; }
         
-        .btn-order { background: var(--success); color: white; border: none; width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
+        .total-box { background: #f0f7ff; padding: 15px; border-radius: 15px; margin: 20px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #d0e3ff; }
+        .total-price { font-size: 22px; font-weight: 800; color: var(--primary); }
+        .btn-order { background: var(--success); color: white; border: none; width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(40,167,69,0.3); }
     </style>
 </head>
 <body>
@@ -57,44 +55,40 @@
     <script>
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/1Kd4ODQgS8QOFHOg2k4lCvRgizqSRnY17qiaStmV6BNY/export?format=csv&gid=415679695';
 
-        // --- НАЛАШТУВАННЯ ТКАНИН ТА КОЛЬОРІВ ---
-        const FABRICS = {
-            oxford: {
-                name: "Оксфорд (600D)",
-                enabled: true,
-                priceModifier: 0,
-                colors: [
-                    { n: "Чорний", c: "#000000" }, { n: "Сірий", c: "#808080" }, 
-                    { n: "Темно-синій", c: "#000080" }, { n: "Червоний", c: "#FF0000" },
-                    { n: "Жовтий", c: "#FFD700" }, { n: "Зелений", c: "#008000" }
-                ]
-            },
-            eco: {
-                name: "Екошкіра",
-                enabled: true, // Постав false, щоб вимкнути всю категорію
-                priceModifier: 250, // Доплата за екошкіру
-                colors: [
-                    { n: "ЕК3 Чорний", c: "#1a1a1a" },
-                    { n: "ЕК19 Білий", c: "#ffffff" }
-                ]
-            },
-            velur: {
-                name: "Велюр (Багіра/Жасмін)",
-                enabled: true,
-                priceModifier: 400, // Доплата за велюр
-                colors: [
-                    { n: "Багіра 14 (Rose)", c: "#d3a3b1" },
-                    { n: "Багіра 19 (Opal)", c: "#8e8e91" },
-                    { n: "Багіра 20 (Ash)", c: "#3c3f4a" },
-                    { n: "Жасмін 02 (Beige)", c: "#e5ddd3" },
-                    { n: "Жасмін 91 (Grey)", c: "#9c9ba0" },
-                    { n: "Жасмін 95 (Dark Grey)", c: "#5a5b5d" },
-                    { n: "Жасмін 100 (Black)", c: "#1d1d1b" }
-                ]
-            }
+        // --- БАЗА КОЛЬОРІВ ---
+        // Щоб тимчасово прибрати колір, просто постав "active: false"
+        const COLOR_DATABASE = {
+            oxford: [
+                { n: "Чорний", c: "#000000", active: true },
+                { n: "Сірий", c: "#808080", active: true },
+                { n: "Темно-синій", c: "#000080", active: true },
+                { n: "Червоний", c: "#FF0000", active: true },
+                { n: "Бордовий", c: "#800000", active: true },
+                { n: "Оранжевий", c: "#FF8C00", active: true },
+                { n: "Жовтий", c: "#FFD700", active: true },
+                { n: "Зелений (Трав'яний)", c: "#008000", active: true },
+                { n: "Темно-зелений", c: "#006400", active: true },
+                { n: "Коричневий", c: "#4B2D0E", active: true },
+                { n: "Бежевий", c: "#F5F5DC", active: true },
+                { n: "Фіолетовий", c: "#800080", active: true },
+                { n: "Салатовий", c: "#7CFC00", active: true },
+                { n: "Блакитний", c: "#00BFFF", active: true }
+            ],
+            eco: [
+                { n: "ЕК3 Чорний", c: "#1a1a1a", active: true },
+                { n: "ЕК19 Білий", c: "#ffffff", active: true }
+            ],
+            velur: [
+                { n: "Багіра 14 (Rose)", c: "#d3a3b1", active: true },
+                { n: "Багіра 19 (Opal)", c: "#8e8e91", active: true },
+                { n: "Багіра 20 (Ash)", c: "#3c3f4a", active: true },
+                { n: "Жасмін 02 (Beige)", c: "#e5ddd3", active: true },
+                { n: "Жасмін 91 (Grey)", c: "#9c9ba0", active: true },
+                { n: "Жасмін 95 (Dark Grey)", c: "#5a5b5d", active: true },
+                { n: "Жасмін 100 (Black)", c: "#1d1d1b", active: true }
+            ]
         };
 
-        const translateMap = { "Кресло": "Крісло", "Двухместная": "Двомісна", "Прямая": "Пряма", "Круглая": "Кругла" };
         let products = [];
         let currentP = null;
 
@@ -103,12 +97,18 @@
                 const res = await fetch(CSV_URL);
                 const csv = await res.text();
                 const rows = csv.split('\n').slice(1);
+                
                 products = rows.map(row => {
                     const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/"/g, '').trim());
-                    let name = c[2] || "";
-                    Object.keys(translateMap).forEach(k => name = name.replace(new RegExp(k, "gi"), translateMap[k]));
-                    return { id: c[0], cat: c[1], name: name, img: c[3], base: parseFloat(c[4]) || 0, xl: parseFloat(c[5]) || 0 };
+                    const num = (v) => parseFloat(v?.replace(',', '.')) || 0;
+                    return {
+                        id: c[0], cat: c[1], name: c[2], img: c[3], 
+                        base: num(c[4]), xl: num(c[5]),
+                        velurPrice: num(c[9]), // Доплата за велюр з колонки J
+                        hasEco: c[11]?.toLowerCase() === 'yes' // Доплата за екошкіру (припустимо +350)
+                    };
                 }).filter(p => p.id);
+
                 render();
                 setupDragScroll();
             } catch (e) { console.error(e); }
@@ -142,25 +142,22 @@
             currentP = products.find(x => x.id === id);
             const modalBody = document.getElementById('modal-body');
             
-            let fabricOptions = "";
-            Object.keys(FABRICS).forEach(key => {
-                if (FABRICS[key].enabled) {
-                    fabricOptions += `<option value="${key}">${FABRICS[key].name}</option>`;
-                }
-            });
+            let fabricOptions = `<option value="oxford">Оксфорд (600D)</option>`;
+            if (currentP.velurPrice > 0) fabricOptions += `<option value="velur">Велюр (+${currentP.velurPrice} грн)</option>`;
+            if (currentP.hasEco) fabricOptions += `<option value="eco">Екошкіра (+350 грн)</option>`;
 
             modalBody.innerHTML = `
                 <img src="images/${currentP.img}" style="width:100%; border-radius:15px; margin-bottom:15px; height:200px; object-fit:contain;">
                 <h2 style="margin:0 0 15px; font-size:18px;">${currentP.name}</h2>
                 
                 <div class="option-group">
-                    <span class="option-label">Оберіть тканину:</span>
+                    <span class="option-label">Тканина:</span>
                     <select id="select-fabric" onchange="updateColors()">${fabricOptions}</select>
                 </div>
 
                 <div class="option-group">
                     <span class="option-label">Колір:</span>
-                    <select id="select-color" onchange="calcTotal()"></select>
+                    <select id="select-color" onchange="styleColorSelect()"></select>
                 </div>
 
                 <div class="total-box">
@@ -168,8 +165,8 @@
                     <span class="total-price" id="total-price">0 грн</span>
                 </div>
                 
-                <button class="btn-order" onclick="sendOrder()">Замовити через Viber</button>
-                <button onclick="closeM()" style="width:100%; padding:12px; background:none; border:none; color:#888; margin-top:10px;">Скасувати</button>
+                <button class="btn-order" onclick="sendOrder()">Замовити у Viber</button>
+                <button onclick="closeM()" style="width:100%; padding:12px; background:none; border:none; color:#888; margin-top:10px; cursor:pointer;">Назад</button>
             `;
             document.getElementById('modal').style.display = 'flex';
             updateColors();
@@ -180,29 +177,57 @@
             const colorSelect = document.getElementById('select-color');
             colorSelect.innerHTML = "";
             
-            FABRICS[fabricKey].colors.forEach(col => {
+            // Фільтруємо лише АКТИВНІ кольори
+            COLOR_DATABASE[fabricKey].filter(col => col.active).forEach(col => {
                 const opt = document.createElement('option');
                 opt.value = col.n;
                 opt.innerText = col.n;
+                opt.dataset.color = col.c;
                 opt.style.backgroundColor = col.c;
-                // Робимо текст білим для темних кольорів
-                if (['#000000', '#000080', '#1a1a1a', '#1d1d1b', '#3c3f4a'].includes(col.c.toLowerCase())) opt.style.color = "white";
+                // Білий текст для темних фонів
+                if (isDark(col.c)) opt.style.color = "white";
                 colorSelect.appendChild(opt);
             });
+            styleColorSelect();
             calcTotal();
+        }
+
+        function styleColorSelect() {
+            const sel = document.getElementById('select-color');
+            const selectedOption = sel.options[sel.selectedIndex];
+            if (selectedOption) {
+                const bgColor = selectedOption.dataset.color;
+                sel.style.backgroundColor = bgColor;
+                sel.style.color = isDark(bgColor) ? "white" : "black";
+            }
+            calcTotal();
+        }
+
+        function isDark(color) {
+            const c = color.substring(1);      // strip #
+            const rgb = parseInt(c, 16);   // convert rrggbb to decimal
+            const r = (rgb >> 16) & 0xff;  // extract red
+            const g = (rgb >>  8) & 0xff;  // extract green
+            const b = (rgb >>  0) & 0xff;  // extract blue
+            const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
+            return luma < 100;
         }
 
         function calcTotal() {
             const fabricKey = document.getElementById('select-fabric').value;
-            const price = (currentP.base || currentP.xl) + FABRICS[fabricKey].priceModifier;
+            let extra = 0;
+            if (fabricKey === 'velur') extra = currentP.velurPrice;
+            if (fabricKey === 'eco') extra = 350;
+
+            const price = (currentP.base || currentP.xl) + extra;
             document.getElementById('total-price').innerText = price + " грн";
         }
 
         function sendOrder() {
-            const fabric = FABRICS[document.getElementById('select-fabric').value].name;
+            const fabric = document.getElementById('select-fabric').options[document.getElementById('select-fabric').selectedIndex].text;
             const color = document.getElementById('select-color').value;
             const price = document.getElementById('total-price').innerText;
-            const text = `Вітаю! Хочу замовити: ${currentP.name}. Тканина: ${fabric}, Колір: ${color}. Ціна: ${price}`;
+            const text = `Замовлення: ${currentP.name}. Тканина: ${fabric}, Колір: ${color}. Ціна: ${price}`;
             window.location.href = `viber://pa?chatURI=ComfortPlus&text=${encodeURIComponent(text)}`;
         }
 

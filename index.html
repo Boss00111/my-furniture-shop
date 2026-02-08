@@ -15,7 +15,7 @@
         .menu-wrapper { position: relative; background: white; border-top: 1px solid #eee; overflow: hidden; }
         .category-menu { display: flex; overflow-x: auto; gap: 8px; padding: 12px 15px; scrollbar-width: none; cursor: grab; }
         .category-menu::-webkit-scrollbar { display: none; }
-        .category-menu button { white-space: nowrap; padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; transition: 0.2s; }
+        .category-menu button { white-space: nowrap; padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; }
 
         #catalog-container { padding: 15px; max-width: 1000px; margin: 0 auto; }
         .category-title { text-align: center; margin: 40px 0 20px; font-size: 17px; font-weight: 800; text-transform: uppercase; color: #555; }
@@ -29,16 +29,19 @@
 
         /* Модалка */
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: flex-end; }
-        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; max-height: 85vh; overflow-y: auto; }
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         
         .option-group { margin-bottom: 12px; text-align: left; }
         .option-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; margin-bottom: 6px; display: block; }
         
-        select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #eee; font-size: 15px; font-weight: 600; background: #fafafa; cursor: pointer; transition: 0.2s; }
+        select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #eee; font-size: 14px; font-weight: 600; background: #fafafa; cursor: pointer; }
         
-        .total-box { background: #eef8ff; padding: 15px; border-radius: 12px; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; }
+        .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; border: 1px solid #eee; font-size: 14px; }
+        .check-item input { width: 18px; height: 18px; }
+
+        .total-box { background: #eef8ff; padding: 15px; border-radius: 12px; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #cce5ff; }
         .total-price { font-size: 20px; font-weight: 800; color: var(--primary); }
-        .btn-order { background: #0088cc; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-order { background: #0088cc; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -55,7 +58,6 @@
     <script>
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/1Kd4ODQgS8QOFHOg2k4lCvRgizqSRnY17qiaStmV6BNY/export?format=csv&gid=415679695';
 
-        // ТОЧНИЙ СПИСОК КОЛЬОРІВ ОКСФОРД
         const COLOR_DATABASE = {
             oxford: [
                 { n: "2 - коричневий", c: "#4B2D0E", active: true },
@@ -103,7 +105,6 @@
             ]
         };
 
-        const translateMap = { "Кресло": "Крісло", "Двухместная": "Двомісна", "Мяч": "М'яч" };
         let products = [];
         let currentP = null;
 
@@ -112,20 +113,18 @@
                 const res = await fetch(CSV_URL);
                 const csv = await res.text();
                 const rows = csv.split('\n').slice(1);
-                
                 products = rows.map(row => {
                     const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/"/g, '').trim());
                     const num = (v) => parseFloat(v?.replace(',', '.')) || 0;
-                    let name = c[2] || "";
-                    Object.keys(translateMap).forEach(k => name = name.replace(new RegExp(k, "gi"), translateMap[k]));
                     return {
-                        id: c[0], cat: c[1], name: name, img: c[3], 
+                        id: c[0], cat: c[1], name: c[2], img: c[3], 
                         base: num(c[4]), xl: num(c[5]),
-                        velurPrice: num(c[9]), // Колонка J
-                        ecoPrice: num(c[11])   // Колонка L
+                        velurPrice: num(c[9]), // J
+                        innerPrice: num(c[10]), // K
+                        ecoPrice: num(c[11]),   // L
+                        comboPrice: num(c[12])  // M
                     };
                 }).filter(p => p.id);
-
                 render();
                 setupDragScroll();
             } catch (e) { console.error(e); }
@@ -141,12 +140,11 @@
             Object.keys(grouped).forEach(cat => {
                 const safeId = "cat-" + cat.replace(/\s+/g, '-').replace(/'/g, '');
                 menu.innerHTML += `<button onclick="document.getElementById('${safeId}').scrollIntoView({behavior:'smooth', block:'center'})">${cat}</button>`;
-                
                 let html = `<section id="${safeId}"><h2 class="category-title">--- ${cat} ---</h2><div class="product-grid">`;
                 grouped[cat].forEach(p => {
                     html += `<div class="product-card">
                         <img src="images/${p.img}" onerror="this.src='https://via.placeholder.com/200'">
-                        <h3>${p.name}</h3>
+                        <h3>${p.name.replace('Кресло','Крісло')}</h3>
                         <div class="price-tag">${p.base || p.xl} грн</div>
                         <button class="btn-select" onclick="openProduct('${p.id}')">Вибрати</button>
                     </div>`;
@@ -165,8 +163,8 @@
             if (currentP.ecoPrice > 0) fabricOptions += `<option value="eco">Екошкіра (+${currentP.ecoPrice} грн)</option>`;
 
             modalBody.innerHTML = `
-                <img src="images/${currentP.img}" style="width:100%; border-radius:15px; margin-bottom:15px; max-height:180px; object-fit:contain;">
-                <h2 style="margin:0 0 10px; font-size:17px;">${currentP.name}</h2>
+                <img src="images/${currentP.img}" style="width:100%; border-radius:15px; margin-bottom:15px; max-height:160px; object-fit:contain;">
+                <h2 style="margin:0 0 10px; font-size:16px;">${currentP.name}</h2>
                 
                 <div class="option-group">
                     <span class="option-label">Тканина:</span>
@@ -174,45 +172,83 @@
                 </div>
 
                 <div class="option-group">
-                    <span class="option-label">Колір:</span>
-                    <select id="select-color" onchange="styleColorSelect()"></select>
+                    <span class="option-label">Основний колір:</span>
+                    <select id="select-color" onchange="styleSelect(this)"></select>
                 </div>
 
+                <div id="combo-section" style="display:none;">
+                    <div class="check-item" onclick="toggleCombo()">
+                        <input type="checkbox" id="check-combo">
+                        <span>Комбінація кольорів (+${currentP.comboPrice} грн)</span>
+                    </div>
+                    <div id="second-color-box" style="display:none;" class="option-group">
+                        <span class="option-label">Другий колір (вставка):</span>
+                        <select id="select-color-2" onchange="styleSelect(this)"></select>
+                    </div>
+                </div>
+
+                ${currentP.innerPrice > 0 ? `
+                    <div class="check-item" onclick="toggleInner()">
+                        <input type="checkbox" id="check-inner">
+                        <span>Внутрішній чохол (+${currentP.innerPrice} грн)</span>
+                    </div>
+                ` : ''}
+
                 <div class="total-box">
-                    <span style="font-weight:600">До сплати:</span>
+                    <span style="font-weight:600">Разом:</span>
                     <span class="total-price" id="total-price">0 грн</span>
                 </div>
                 
-                <button class="btn-order" onclick="sendToTelegram()">📱 Замовити у Telegram</button>
-                <button onclick="closeM()" style="width:100%; padding:10px; background:none; border:none; color:#999; margin-top:10px; font-size:13px;">Назад</button>
+                <button class="btn-order" onclick="sendToTelegram()">Замовити у Telegram</button>
+                <button onclick="closeM()" style="width:100%; padding:10px; background:none; border:none; color:#999; margin-top:10px;">Назад</button>
             `;
+            
+            if (currentP.comboPrice > 0) document.getElementById('combo-section').style.display = 'block';
+            
             document.getElementById('modal').style.display = 'flex';
             updateColors();
         }
 
         function updateColors() {
             const fabricKey = document.getElementById('select-fabric').value;
-            const colorSelect = document.getElementById('select-color');
-            colorSelect.innerHTML = "";
-            COLOR_DATABASE[fabricKey].filter(col => col.active).forEach(col => {
-                const opt = document.createElement('option');
-                opt.value = col.n;
-                opt.innerText = col.n;
-                opt.dataset.color = col.c;
-                opt.style.backgroundColor = col.c;
-                if (isDark(col.c)) opt.style.color = "white";
-                colorSelect.appendChild(opt);
-            });
-            styleColorSelect();
+            const colors = COLOR_DATABASE[fabricKey].filter(col => col.active);
+            
+            const fill = (el) => {
+                el.innerHTML = "";
+                colors.forEach(col => {
+                    const opt = document.createElement('option');
+                    opt.value = col.n; opt.innerText = col.n; opt.dataset.color = col.c;
+                    opt.style.backgroundColor = col.c;
+                    if (isDark(col.c)) opt.style.color = "white";
+                    el.appendChild(opt);
+                });
+                styleSelect(el);
+            };
+
+            fill(document.getElementById('select-color'));
+            fill(document.getElementById('select-color-2'));
+            calcTotal();
         }
 
-        function styleColorSelect() {
-            const sel = document.getElementById('select-color');
-            const opt = sel.options[sel.selectedIndex];
+        function styleSelect(el) {
+            const opt = el.options[el.selectedIndex];
             if (opt) {
-                sel.style.backgroundColor = opt.dataset.color;
-                sel.style.color = isDark(opt.dataset.color) ? "white" : "black";
+                el.style.backgroundColor = opt.dataset.color;
+                el.style.color = isDark(opt.dataset.color) ? "white" : "black";
             }
+            calcTotal();
+        }
+
+        function toggleCombo() {
+            const ch = document.getElementById('check-combo');
+            if (event.target.tagName !== 'INPUT') ch.checked = !ch.checked;
+            document.getElementById('second-color-box').style.display = ch.checked ? 'block' : 'none';
+            calcTotal();
+        }
+
+        function toggleInner() {
+            const ch = document.getElementById('check-inner');
+            if (event.target.tagName !== 'INPUT') ch.checked = !ch.checked;
             calcTotal();
         }
 
@@ -223,18 +259,26 @@
         }
 
         function calcTotal() {
-            const fabricKey = document.getElementById('select-fabric').value;
-            let extra = 0;
-            if (fabricKey === 'velur') extra = currentP.velurPrice;
-            if (fabricKey === 'eco') extra = currentP.ecoPrice;
-            document.getElementById('total-price').innerText = ((currentP.base || currentP.xl) + extra) + " грн";
+            let total = currentP.base || currentP.xl;
+            const fabric = document.getElementById('select-fabric').value;
+            if (fabric === 'velur') total += currentP.velurPrice;
+            if (fabric === 'eco') total += currentP.ecoPrice;
+            
+            if (document.getElementById('check-inner')?.checked) total += currentP.innerPrice;
+            if (document.getElementById('check-combo')?.checked) total += currentP.comboPrice;
+
+            document.getElementById('total-price').innerText = total + " грн";
         }
 
         function sendToTelegram() {
             const fabric = document.getElementById('select-fabric').options[document.getElementById('select-fabric').selectedIndex].text;
-            const color = document.getElementById('select-color').value;
+            const color1 = document.getElementById('select-color').value;
+            const isCombo = document.getElementById('check-combo')?.checked;
+            const color2 = isCombo ? ` + ${document.getElementById('select-color-2').value}` : '';
+            const inner = document.getElementById('check-inner')?.checked ? ' (З чохлом)' : '';
             const price = document.getElementById('total-price').innerText;
-            const text = `🛒 ЗАМОВЛЕННЯ\n—\nВиріб: ${currentP.name}\nТканина: ${fabric}\nКолір: ${color}\nСума: ${price}`;
+
+            const text = `🛒 ЗАМОВЛЕННЯ\n—\nВиріб: ${currentP.name}\nТканина: ${fabric}\nКолір: ${color1}${color2}\nДодатки: ${inner || 'немає'}\nСума: ${price}`;
             window.location.href = `https://t.me/ComfortPlusManager?text=${encodeURIComponent(text)}`;
         }
 

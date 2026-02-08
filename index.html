@@ -15,7 +15,7 @@
         .menu-wrapper { position: relative; background: white; border-top: 1px solid #eee; overflow: hidden; }
         .category-menu { display: flex; overflow-x: auto; gap: 8px; padding: 12px 15px; scrollbar-width: none; cursor: grab; -webkit-overflow-scrolling: touch; }
         .category-menu::-webkit-scrollbar { display: none; }
-        .category-menu button { white-space: nowrap; padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; transition: 0.2s; }
+        .category-menu button { white-space: nowrap; padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; }
 
         #catalog-container { padding: 15px; max-width: 1000px; margin: 0 auto; padding-bottom: 100px; }
         .category-title { text-align: center; margin: 40px 0 20px; font-size: 17px; font-weight: 800; text-transform: uppercase; color: #555; }
@@ -23,45 +23,46 @@
 
         .product-card { background: white; border-radius: 15px; padding: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.04); text-align: center; display: flex; flex-direction: column; }
         .product-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; }
-        .product-card h3 { font-size: 13px; margin: 10px 0; min-height: 32px; color: #222; line-height: 1.2; }
+        .product-card h3 { font-size: 13px; margin: 10px 0; min-height: 32px; color: #222; }
         .price-tag { font-weight: 700; color: var(--success); font-size: 15px; margin-bottom: 10px; }
-        .btn-select { background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .btn-select { background: #007bff; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: flex-end; }
         .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; max-height: 95vh; overflow-y: auto; }
         
         .option-group { margin-bottom: 12px; text-align: left; }
         .option-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; margin-bottom: 6px; display: block; }
-        select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #eee; font-size: 14px; font-weight: 600; background: #fafafa; cursor: pointer; }
+        select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #eee; font-size: 14px; font-weight: 600; background: #fafafa; }
         
-        .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid #eee; font-size: 13px; font-weight: 600; }
-        .check-item input { width: 18px; height: 18px; pointer-events: none; }
-
+        .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #eee; font-size: 13px; font-weight: 600; }
+        
         .qty-box { display: flex; align-items: center; background: #f0f0f0; border-radius: 10px; padding: 5px; width: fit-content; margin: 10px 0; }
-        .qty-btn { width: 40px; height: 40px; border: none; background: white; border-radius: 8px; font-size: 20px; font-weight: 700; cursor: pointer; color: var(--primary); }
-        .qty-input { width: 70px; border: none; background: transparent; text-align: center; font-size: 18px; font-weight: 800; color: #333; outline: none; }
+        .qty-btn { width: 40px; height: 40px; border: none; background: white; border-radius: 8px; font-size: 20px; font-weight: 700; color: var(--primary); }
+        .qty-input { width: 60px; border: none; background: transparent; text-align: center; font-size: 18px; font-weight: 800; }
 
         .total-box { background: #eef8ff; padding: 15px; border-radius: 12px; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #cce5ff; }
         .total-price { font-size: 20px; font-weight: 800; color: var(--primary); }
 
-        /* КОШИК */
-        #cart-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: #333; color: white; border-radius: 50px; display: none; justify-content: space-between; align-items: center; padding: 12px 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 999; cursor: pointer; }
+        /* КОШИК - СТИЛЬ ЯК РАНІШЕ */
+        #cart-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 350px; background: #222; color: white; border-radius: 50px; display: none; justify-content: space-between; align-items: center; padding: 12px 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 999; cursor: pointer; border: 1px solid #444; }
+        #cart-bar:active { transform: translateX(-50%) scale(0.95); }
+        #cart-count { background: var(--primary); color: white; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 800; margin-left: 8px; }
+
         #cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1100; flex-direction: column; }
-        .cart-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .cart-items { flex: 1; overflow-y: auto; padding: 20px; }
-        .cart-item { border-bottom: 1px solid #eee; padding: 15px 0; position: relative; }
-        .cart-item-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
-        .cart-item-info { font-size: 12px; color: #666; line-height: 1.4; }
-        .cart-item-price { font-weight: 700; color: var(--primary); margin-top: 5px; }
-        .remove-btn { position: absolute; right: 0; top: 15px; color: #ff4444; border: none; background: none; font-size: 20px; cursor: pointer; }
-        .cart-footer { padding: 20px; border-top: 1px solid #eee; }
-        .btn-order { background: #0088cc; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
+        .cart-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fdfdfd; }
+        .cart-items { flex: 1; overflow-y: auto; padding: 15px; }
+        .cart-item { border-bottom: 1px solid #f0f0f0; padding: 15px 0; position: relative; }
+        .cart-item-title { font-weight: 700; font-size: 15px; color: #111; margin-bottom: 4px; padding-right: 30px; }
+        .cart-item-info { font-size: 12px; color: #777; line-height: 1.5; }
+        .remove-btn { position: absolute; right: 0; top: 12px; color: #ff4444; border: none; background: #fff1f1; width: 30px; height: 30px; border-radius: 50%; font-size: 18px; cursor: pointer; }
+        
+        .btn-order { background: #0088cc; color: white; border: none; width: 100%; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🛍️ Comfort Plus | Store</h1>
+        <h1>🛍️ Comfort Plus | Меблі</h1>
         <div class="menu-wrapper">
             <div class="category-menu" id="main-menu"></div>
         </div>
@@ -70,19 +71,25 @@
     <div id="catalog-container">Завантаження...</div>
 
     <div id="cart-bar" onclick="showCart()">
-        <span id="cart-count">Кошик (0)</span>
-        <span id="cart-total-bar">0 грн</span>
+        <div style="display:flex; align-items:center;">
+            <span>Кошик</span>
+            <span id="cart-count">0</span>
+        </div>
+        <span id="cart-total-bar" style="font-weight:700;">0 грн</span>
     </div>
 
     <div id="cart-modal">
         <div class="cart-header">
-            <h2 style="margin:0">Твій кошик</h2>
-            <button onclick="hideCart()" style="border:none; background:none; font-size:24px;">×</button>
+            <h2 style="margin:0; font-size: 20px;">Ваше замовлення</h2>
+            <button onclick="hideCart()" style="border:none; background:none; font-size:30px; color:#ccc;">&times;</button>
         </div>
         <div class="cart-items" id="cart-items-list"></div>
-        <div class="cart-footer">
-            <div class="total-box"><span>Всього до сплати:</span><span id="cart-final-total" class="total-price">0 грн</span></div>
-            <button class="btn-order" onclick="sendAllToTelegram()">Надіслати замовлення</button>
+        <div class="cart-footer" style="padding: 20px;">
+            <div class="total-box">
+                <span style="font-weight:600;">Разом:</span>
+                <span id="cart-final-total" class="total-price">0 грн</span>
+            </div>
+            <button class="btn-order" onclick="sendAllToTelegram()">Оформити замовлення</button>
         </div>
     </div>
 
@@ -90,44 +97,14 @@
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/1Kd4ODQgS8QOFHOg2k4lCvRgizqSRnY17qiaStmV6BNY/export?format=csv&gid=415679695';
 
         const COLOR_DATABASE = {
-            oxford: [
-                { n: "2 - коричневий", c: "#4B2D0E" }, { n: "3 - какао", c: "#A38A75" },
-                { n: "4 - бежевий", c: "#F5F5DC" }, { n: "4/1 - пісочний", c: "#C2B280" },
-                { n: "4/2 - пудровий", c: "#DEB887" }, { n: "5 - електрик", c: "#0000FF" },
-                { n: "6 - трава", c: "#008000" }, { n: "7 - малина", c: "#E30B5D" },
-                { n: "8 - темно-синій", c: "#000080" }, { n: "9 - блакитний", c: "#00BFFF" },
-                { n: "10 - фіолетовий", c: "#800080" }, { n: "11 - м'ята", c: "#3EB489" },
-                { n: "12 - червоний", c: "#FF0000" }, { n: "13 - гірчичний", c: "#E1AD01" },
-                { n: "14 - жовтий", c: "#FFD700" }, { n: "14/1 - жовтогарячий", c: "#FF8C00" },
-                { n: "15 - сірий", c: "#808080" }, { n: "17 - темно-сірий", c: "#4F4F4F" },
-                { n: "18 - вино", c: "#722F37" }, { n: "19 - блакитний світлий", c: "#ADD8E6" },
-                { n: "20 - білий", c: "#FFFFFF" }, { n: "21 - рожевий пиловий", c: "#C08081" },
-                { n: "22 - оранжевий", c: "#FFA500" }, { n: "26 - салат", c: "#7CFC00" },
-                { n: "27 - бузок", c: "#C8A2C8" }, { n: "28 - темно-зелений", c: "#006400" },
-                { n: "29 - хакі", c: "#C3B091" }, { n: "30 - чорний", c: "#000000" },
-                { n: "32 - рожевий (Барбі)", c: "#DA1884" }
-            ],
+            oxford: [{ n: "2 - коричневий", c: "#4B2D0E" }, { n: "3 - какао", c: "#A38A75" }, { n: "4 - бежевий", c: "#F5F5DC" }, { n: "4/1 - пісочний", c: "#C2B280" }, { n: "4/2 - пудровий", c: "#DEB887" }, { n: "5 - електрик", c: "#0000FF" }, { n: "6 - трава", c: "#008000" }, { n: "7 - малина", c: "#E30B5D" }, { n: "8 - темно-синій", c: "#000080" }, { n: "9 - блакитний", c: "#00BFFF" }, { n: "10 - фіолетовий", c: "#800080" }, { n: "11 - м'ята", c: "#3EB489" }, { n: "12 - червоний", c: "#FF0000" }, { n: "13 - гірчичний", c: "#E1AD01" }, { n: "14 - жовтий", c: "#FFD700" }, { n: "14/1 - жовтогарячий", c: "#FF8C00" }, { n: "15 - сірий", c: "#808080" }, { n: "17 - темно-сірий", c: "#4F4F4F" }, { n: "18 - вино", c: "#722F37" }, { n: "19 - блакитний світлий", c: "#ADD8E6" }, { n: "20 - білий", c: "#FFFFFF" }, { n: "21 - рожевий пиловий", c: "#C08081" }, { n: "22 - оранжевий", c: "#FFA500" }, { n: "26 - салат", c: "#7CFC00" }, { n: "27 - бузок", c: "#C8A2C8" }, { n: "28 - темно-зелений", c: "#006400" }, { n: "29 - хакі", c: "#C3B091" }, { n: "30 - чорний", c: "#000000" }, { n: "32 - рожевий (Барбі)", c: "#DA1884" }],
             eco: [{ n: "ЕК3 Чорний", c: "#1a1a1a" }, { n: "ЕК19 Білий", c: "#ffffff" }],
-            velur: [
-                { n: "Багіра 14 (Rose)", c: "#d3a3b1" }, { n: "Багіра 19 (Opal)", c: "#8e8e91" },
-                { n: "Багіра 20 (Ash)", c: "#3c3f4a" }, { n: "Жасмін 02 (Beige)", c: "#e5ddd3" },
-                { n: "Жасмін 91 (Grey)", c: "#9c9ba0" }, { n: "Жасмін 95 (Dark Grey)", c: "#5a5b5d" },
-                { n: "Жасмін 100 (Black)", c: "#1d1d1b" }
-            ]
+            velur: [{ n: "Багіра 14 (Rose)", c: "#d3a3b1" }, { n: "Багіра 19 (Opal)", c: "#8e8e91" }, { n: "Багіра 20 (Ash)", c: "#3c3f4a" }, { n: "Жасмін 02 (Beige)", c: "#e5ddd3" }, { n: "Жасмін 91 (Grey)", c: "#9c9ba0" }, { n: "Жасмін 95 (Dark Grey)", c: "#5a5b5d" }, { n: "Жасмін 100 (Black)", c: "#1d1d1b" }]
         };
 
         let products = [];
         let currentP = null;
         let cart = [];
-
-        function initScroll() {
-            const slider = document.querySelector('.category-menu');
-            let isDown = false; let startX; let scrollLeft;
-            slider.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
-            slider.addEventListener('mouseleave', () => { isDown = false; });
-            slider.addEventListener('mouseup', () => { isDown = false; });
-            slider.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 2; slider.scrollLeft = scrollLeft - walk; });
-        }
 
         async function init() {
             try {
@@ -137,31 +114,25 @@
                 products = rows.map(row => {
                     const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/"/g, '').trim());
                     const num = (v) => parseFloat(v?.replace(',', '.')) || 0;
-                    return {
-                        id: c[0], cat: c[1], name: c[2], img: c[3], 
-                        l: num(c[4]), xl: num(c[5]), xxl: num(c[6]), xxxl: num(c[7]),
-                        velurPrice: num(c[9]), innerPrice: num(c[10]), ecoPrice: num(c[11]), diffPrice: num(c[12])
-                    };
+                    return { id: c[0], cat: c[1], name: c[2], img: c[3], l: num(c[4]), xl: num(c[5]), xxl: num(c[6]), xxxl: num(c[7]), velurPrice: num(c[9]), innerPrice: num(c[10]), ecoPrice: num(c[11]), diffPrice: num(c[12]) };
                 }).filter(p => p.id);
                 render();
-                initScroll();
             } catch (e) { console.error(e); }
         }
 
         function render() {
             const menu = document.getElementById('main-menu');
             const catalog = document.getElementById('catalog-container');
-            menu.innerHTML = ''; catalog.innerHTML = '';
             const grouped = {};
             products.forEach(p => { if (!grouped[p.cat]) grouped[p.cat] = []; grouped[p.cat].push(p); });
 
             Object.keys(grouped).forEach(cat => {
-                const safeId = "cat-" + cat.replace(/\s+/g, '-').replace(/'/g, '');
+                const safeId = "cat-" + cat.replace(/\s+/g, '-');
                 menu.innerHTML += `<button onclick="document.getElementById('${safeId}').scrollIntoView({behavior:'smooth', block:'center'})">${cat}</button>`;
                 let html = `<section id="${safeId}"><h2 class="category-title">--- ${cat} ---</h2><div class="product-grid">`;
                 grouped[cat].forEach(p => {
                     html += `<div class="product-card">
-                        <img src="images/${p.img}" onerror="this.src='https://via.placeholder.com/200'">
+                        <img src="images/${p.img}">
                         <h3>${p.name}</h3>
                         <div class="price-tag">від ${p.l || p.xl} грн</div>
                         <button class="btn-select" onclick="openProduct('${p.id}')">Вибрати</button>
@@ -173,33 +144,15 @@
         }
 
         function getSizeLabel(key, p) {
-            const nl = p.name.toLowerCase();
-            const cl = p.cat.toLowerCase();
-            const isSwing = cl.includes('гойд') || cl.includes('кач') || nl.includes('гойд') || nl.includes('кач');
-            const isFuton = cl.includes('футон') || nl.includes('футон');
-            const isBall = nl.includes('мяч');
-
-            if (isSwing) {
-                const isDouble = nl.includes('двом') || nl.includes('2-м');
-                if (isDouble) {
-                    if (key === 'l') return 'L (120х80 см)';
-                    if (key === 'xl') return 'XL (150х80 см)';
-                    if (key === 'xxl') return 'XXL (180х90 см)';
-                } else {
-                    if (key === 'l') return 'L (80см)';
-                    if (key === 'xl') return 'XL (95см)';
-                }
-            }
-            if (isFuton) {
-                if (key === 'l') return 'L (160х80 см)';
-                if (key === 'xl') return 'XL (180х100 см)';
-            }
-            if (isBall) {
+            const name = p.name.toLowerCase();
+            // Покращена перевірка на "М'яч" (враховуємо апостроф і регістр)
+            if (name.includes('мяч') || name.includes('м\'яч')) {
                 if (key === 'l') return 'L (50 см)';
                 if (key === 'xl') return 'XL (70 см)';
                 if (key === 'xxl') return 'XXL (100 см)';
                 if (key === 'xxxl') return '3XL (130 см)';
             }
+            // Стандартні розміри для крісел
             const labels = { l: 'L (85х65 см)', xl: 'XL (105х85 см)', xxl: '2XL (130х90 см)', xxxl: '3XL (140х100 см)' };
             return labels[key] || key.toUpperCase();
         }
@@ -207,216 +160,149 @@
         function openProduct(id) {
             currentP = products.find(x => x.id === id);
             const modalBody = document.getElementById('modal-body');
-            const nl = currentP.name.toLowerCase();
-            const cl = currentP.cat.toLowerCase();
             
-            const isSwing = cl.includes('гойд') || cl.includes('кач') || nl.includes('гойд') || nl.includes('кач');
-            const isFuton = cl.includes('футон') || nl.includes('футон');
-
             let sizeOptions = "";
             ['l', 'xl', 'xxl', 'xxxl'].forEach(key => {
                 if (currentP[key] > 0) {
-                    const label = getSizeLabel(key, currentP);
-                    sizeOptions += `<option value="${key}" ${key === 'xl' ? 'selected' : ''}>${label}</option>`;
+                    sizeOptions += `<option value="${key}" ${key === 'xl' ? 'selected' : ''}>${getSizeLabel(key, currentP)}</option>`;
                 }
             });
 
-            let comboLabel = "Комбінація кольорів (Вставка)";
-            let secondColorLabel = "Другий колір (Вставка)";
-            if (isSwing) { comboLabel = "Комбінація кольорів подушки"; secondColorLabel = "Другий колір (Подушка)"; }
-            else if (isFuton) { comboLabel = "Комбінація кольорів (Верх/Низ)"; secondColorLabel = "Другий колір (Верх)"; }
-
-            let fabricOptions = `<option value="oxford">Оксфорд (600D)</option>`;
-            if (currentP.velurPrice > 0) fabricOptions += `<option value="velur">Велюр (+${currentP.velurPrice} грн)</option>`;
-            if (currentP.ecoPrice > 0) fabricOptions += `<option value="eco">Екошкіра (+${currentP.ecoPrice} грн)</option>`;
-
             modalBody.innerHTML = `
-                <img src="images/${currentP.img}" style="width:100%; border-radius:15px; margin-bottom:10px; max-height:160px; object-fit:contain;">
-                <h2 style="margin:0 0 10px; font-size:16px;">${currentP.name}</h2>
+                <h2 style="margin:0 0 15px; font-size:18px;">${currentP.name}</h2>
                 ${sizeOptions ? `<div class="option-group"><span class="option-label">Розмір:</span><select id="select-size" onchange="calcTotal()">${sizeOptions}</select></div>` : ''}
-                <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()">${fabricOptions}</select></div>
+                <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()"><option value="oxford">Оксфорд (600D)</option>${currentP.velurPrice > 0 ? `<option value="velur">Велюр (+${currentP.velurPrice} грн)</option>` : ''}${currentP.ecoPrice > 0 ? `<option value="eco">Екошкіра (+${currentP.ecoPrice} грн)</option>` : ''}</select></div>
                 <div class="option-group"><span class="option-label">Основний колір:</span><select id="select-color" onchange="styleSelect(this)"></select></div>
-                <div id="dynamic-checks">
-                    ${(currentP.diffPrice > 0 || isSwing) ? `
-                        <div class="check-item" onclick="handleSpecialOptions('combo')">
-                            <input type="checkbox" id="check-combo">
-                            <span>${comboLabel} (+${currentP.diffPrice} грн)</span>
-                        </div>
-                    ` : ''}
-                    ${isSwing ? `
-                        <div class="check-item" onclick="handleSpecialOptions('diff')">
-                            <input type="checkbox" id="check-diff-color">
-                            <span>Подушка іншого кольору (+${currentP.diffPrice} грн)</span>
-                        </div>
-                    ` : ''}
+                <div id="extra-options">
+                    ${currentP.diffPrice > 0 ? `<div class="check-item" onclick="toggleCheck('check-combo')"><input type="checkbox" id="check-combo"> <span>Комбінація кольорів (+${currentP.diffPrice} грн)</span></div>` : ''}
+                    ${currentP.innerPrice > 0 ? `<div class="check-item" onclick="toggleCheck('check-inner')"><input type="checkbox" id="check-inner"> <span>Внутрішній чохол (+${currentP.innerPrice} грн)</span></div>` : ''}
                 </div>
-                <div id="second-color-box" style="display:none;" class="option-group">
-                    <span class="option-label">${secondColorLabel}:</span>
-                    <select id="select-color-2" onchange="styleSelect(this)"></select>
-                </div>
-                ${currentP.innerPrice > 0 ? `<div class="check-item" onclick="toggleSimple('check-inner')"><input type="checkbox" id="check-inner"><span>Внутрішній чохол (+${currentP.innerPrice} грн)</span></div>` : ''}
-                <div class="option-group">
-                    <span class="option-label">Кількість:</span>
-                    <div class="qty-box"><button class="qty-btn" onclick="adjustQty(-1)">-</button><input type="number" id="qty-input" class="qty-input" value="1" min="1" oninput="calcTotal()"><button class="qty-btn" onclick="adjustQty(1)">+</button></div>
-                </div>
+                <div id="second-color-box" style="display:none;" class="option-group"><span class="option-label">Колір вставки:</span><select id="select-color-2" onchange="styleSelect(this)"></select></div>
+                <div class="option-group"><span class="option-label">Кількість:</span><div class="qty-box"><button class="qty-btn" onclick="adjustQty(-1)">-</button><input type="number" id="qty-input" class="qty-input" value="1" readonly><button class="qty-btn" onclick="adjustQty(1)">+</button></div></div>
                 <div class="total-box"><span>Разом:</span><span class="total-price" id="total-price">0 грн</span></div>
-                <button class="btn-order" onclick="addToCart()">Додати в кошик</button>
-                <button onclick="closeM()" style="width:100%; padding:10px; background:none; border:none; color:#999; margin-top:10px;">Назад</button>
+                <button class="btn-order" onclick="addToCart()">Додати до кошика</button>
             `;
             updateColors();
             document.getElementById('modal').style.display = 'flex';
         }
 
-        function handleSpecialOptions(mode) {
-            const combo = document.getElementById('check-combo');
-            const diff = document.getElementById('check-diff-color');
-            const box2 = document.getElementById('second-color-box');
-            if (mode === 'combo' && combo) { combo.checked = !combo.checked; if (combo.checked && diff) diff.checked = false; }
-            else if (mode === 'diff' && diff) { diff.checked = !diff.checked; if (diff.checked && combo) combo.checked = false; }
-            if (box2) box2.style.display = (combo?.checked || diff?.checked) ? 'block' : 'none';
+        function toggleCheck(id) {
+            const ch = document.getElementById(id);
+            ch.checked = !ch.checked;
+            if (id === 'check-combo') document.getElementById('second-color-box').style.display = ch.checked ? 'block' : 'none';
             calcTotal();
         }
 
-        function toggleSimple(id) { const el = document.getElementById(id); if (el) el.checked = !el.checked; calcTotal(); }
-        function adjustQty(v) { const input = document.getElementById('qty-input'); input.value = Math.max(1, (parseInt(input.value) || 1) + v); calcTotal(); }
+        function adjustQty(v) {
+            const input = document.getElementById('qty-input');
+            input.value = Math.max(1, parseInt(input.value) + v);
+            calcTotal();
+        }
 
         function updateColors() {
-            const fabricKey = document.getElementById('select-fabric').value;
-            const colors = COLOR_DATABASE[fabricKey];
+            const fabric = document.getElementById('select-fabric').value;
+            const colors = COLOR_DATABASE[fabric];
             const fill = (el) => {
-                if (!el) return; el.innerHTML = "";
-                colors.forEach(col => {
+                el.innerHTML = "";
+                colors.forEach(c => {
                     const opt = document.createElement('option');
-                    opt.value = col.n; opt.innerText = col.n; opt.dataset.color = col.c;
-                    opt.style.backgroundColor = col.c; if (isDark(col.c)) opt.style.color = "white";
+                    opt.value = c.n; opt.innerText = c.n; opt.dataset.color = c.c;
+                    opt.style.backgroundColor = c.c;
                     el.appendChild(opt);
                 });
                 styleSelect(el);
             };
             fill(document.getElementById('select-color'));
-            fill(document.getElementById('select-color-2'));
+            if(document.getElementById('select-color-2')) fill(document.getElementById('select-color-2'));
         }
 
         function styleSelect(el) {
-            const opt = el.options[el.selectedIndex];
-            if (opt) { el.style.backgroundColor = opt.dataset.color; el.style.color = isDark(opt.dataset.color) ? "white" : "black"; }
+            const color = el.options[el.selectedIndex].dataset.color;
+            el.style.backgroundColor = color;
+            el.style.color = isDark(color) ? "white" : "black";
             calcTotal();
         }
 
         function isDark(color) {
             const rgb = parseInt(color.substring(1), 16);
-            return (0.2126 * ((rgb >> 16) & 0xff) + 0.7152 * ((rgb >> 8) & 0xff) + 0.0722 * (rgb & 0xff)) < 130;
+            const r = (rgb >> 16) & 0xff, g = (rgb >> 8) & 0xff, b = (rgb >> 0) & 0xff;
+            return (0.2126 * r + 0.7152 * g + 0.0722 * b) < 128;
         }
 
         function calcTotal() {
-            if (!currentP) return;
-            const sizeKey = document.getElementById('select-size')?.value || 'l';
-            let p = currentP[sizeKey] || 0;
+            const size = document.getElementById('select-size')?.value || 'l';
+            let price = currentP[size];
             const fabric = document.getElementById('select-fabric').value;
-            if (fabric === 'velur') p += currentP.velurPrice;
-            if (fabric === 'eco') p += currentP.ecoPrice;
-            if (document.getElementById('check-inner')?.checked) p += currentP.innerPrice;
-            if (document.getElementById('check-combo')?.checked || document.getElementById('check-diff-color')?.checked) p += currentP.diffPrice;
-            const qty = parseInt(document.getElementById('qty-input').value) || 1;
-            document.getElementById('total-price').innerText = (p * qty) + " грн";
-            return p * qty;
+            if (fabric === 'velur') price += currentP.velurPrice;
+            if (fabric === 'eco') price += currentP.ecoPrice;
+            if (document.getElementById('check-combo')?.checked) price += currentP.diffPrice;
+            if (document.getElementById('check-inner')?.checked) price += currentP.innerPrice;
+            const qty = parseInt(document.getElementById('qty-input').value);
+            document.getElementById('total-price').innerText = (price * qty) + " грн";
+            return price * qty;
         }
 
-        // КОШИК ЛОГІКА
         function addToCart() {
-            const qty = parseInt(document.getElementById('qty-input').value);
             const sizeEl = document.getElementById('select-size');
-            const fabric = document.getElementById('select-fabric').options[document.getElementById('select-fabric').selectedIndex].text;
-            const color1 = document.getElementById('select-color').value;
-            const isCombo = document.getElementById('check-combo')?.checked;
-            const isDiff = document.getElementById('check-diff-color')?.checked;
-            const color2 = (isCombo || isDiff) ? document.getElementById('select-color-2').value : null;
-            
-            let adds = [];
-            if (document.getElementById('check-inner')?.checked) adds.push("Внутр. чохол");
-            if (isCombo) adds.push("Комбінація");
-            if (isDiff) adds.push("Подушка інш. кольору");
-
             const item = {
                 name: currentP.name,
                 size: sizeEl ? sizeEl.options[sizeEl.selectedIndex].text : '',
-                fabric: fabric,
-                color1: color1,
-                color2: color2,
-                adds: adds,
-                qty: qty,
+                fabric: document.getElementById('select-fabric').options[document.getElementById('select-fabric').selectedIndex].text,
+                color: document.getElementById('select-color').value,
+                color2: document.getElementById('check-combo')?.checked ? document.getElementById('select-color-2').value : null,
+                inner: document.getElementById('check-inner')?.checked,
+                qty: parseInt(document.getElementById('qty-input').value),
                 price: calcTotal()
             };
-
             cart.push(item);
-            updateCartUI();
             closeM();
+            updateCartBar();
         }
 
-        function updateCartUI() {
+        function updateCartBar() {
             const bar = document.getElementById('cart-bar');
             if (cart.length > 0) {
                 bar.style.display = 'flex';
-                document.getElementById('cart-count').innerText = `Кошик (${cart.length})`;
-                const total = cart.reduce((sum, item) => sum + item.price, 0);
-                document.getElementById('cart-total-bar').innerText = `${total} грн`;
-            } else {
-                bar.style.display = 'none';
-            }
+                document.getElementById('cart-count').innerText = cart.length;
+                document.getElementById('cart-total-bar').innerText = cart.reduce((s, i) => s + i.price, 0) + " грн";
+            } else { bar.style.display = 'none'; }
         }
 
         function showCart() {
             const list = document.getElementById('cart-items-list');
             list.innerHTML = '';
-            let total = 0;
-            cart.forEach((item, index) => {
-                total += item.price;
+            cart.forEach((item, idx) => {
                 list.innerHTML += `
                     <div class="cart-item">
-                        <button class="remove-btn" onclick="removeFromCart(${index})">×</button>
+                        <button class="remove-btn" onclick="removeItem(${idx})">&times;</button>
                         <div class="cart-item-title">${item.name} (${item.qty} шт)</div>
                         <div class="cart-item-info">
-                            ${item.size ? 'Розмір: ' + item.size + '<br>' : ''}
-                            Тканина: ${item.fabric}<br>
-                            Колір: ${item.color1}${item.color2 ? ' + ' + item.color2 : ''}<br>
-                            ${item.adds.length ? 'Додатки: ' + item.adds.join(', ') : ''}
+                            ${item.size ? 'Розмір: ' + item.size : ''}<br>
+                            Тканина: ${item.fabric}, Колір: ${item.color}${item.color2 ? ' + ' + item.color2 : ''}
+                            ${item.inner ? '<br>+ Внутрішній чохол' : ''}
                         </div>
-                        <div class="cart-item-price">${item.price} грн</div>
-                    </div>
-                `;
+                        <div style="font-weight:700; color:#0088cc; margin-top:5px;">${item.price} грн</div>
+                    </div>`;
             });
-            document.getElementById('cart-final-total').innerText = total + " грн";
+            document.getElementById('cart-final-total').innerText = cart.reduce((s, i) => s + i.price, 0) + " грн";
             document.getElementById('cart-modal').style.display = 'flex';
         }
 
         function hideCart() { document.getElementById('cart-modal').style.display = 'none'; }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            if (cart.length === 0) hideCart();
-            updateCartUI();
-            showCart();
-        }
+        function removeItem(idx) { cart.splice(idx, 1); if (cart.length === 0) hideCart(); updateCartBar(); showCart(); }
 
         function sendAllToTelegram() {
-            let text = "🛒 НОВЕ ЗАМОВЛЕННЯ\n—\n";
-            let total = 0;
+            let msg = "🛒 ЗАМОВЛЕННЯ:\n\n";
             cart.forEach((item, i) => {
-                total += item.price;
-                text += `${i+1}. ${item.name} x${item.qty}\n`;
-                if(item.size) text += `   Розмір: ${item.size}\n`;
-                text += `   Тканина: ${item.fabric}\n`;
-                text += `   Колір: ${item.color1}${item.color2 ? ' + ' + item.color2 : ''}\n`;
-                if(item.adds.length) text += `   Додатки: ${item.adds.join(', ')}\n`;
-                text += `   Сума: ${item.price} грн\n—\n`;
+                msg += `${i+1}. ${item.name} x${item.qty}\n- ${item.size}\n- ${item.fabric}, ${item.color}${item.color2 ? ' + '+item.color2 : ''}${item.inner ? '\n- +Внутр. чохол' : ''}\n- Ціна: ${item.price} грн\n\n`;
             });
-            text += `💰 ЗАГАЛОМ: ${total} грн`;
-            window.location.href = `https://t.me/ComfortPlusManager?text=${encodeURIComponent(text)}`;
+            msg += `💰 ЗАГАЛОМ: ${cart.reduce((s, i) => s + i.price, 0)} грн`;
+            window.location.href = `https://t.me/ComfortPlusManager?text=${encodeURIComponent(msg)}`;
         }
 
         function createModal() {
             const m = document.createElement('div'); m.id = 'modal';
-            m.innerHTML = `<div class="modal-content"><div id="modal-body"></div></div>`;
+            m.innerHTML = `<div class="modal-content"><div id="modal-body"></div><button onclick="closeM()" style="width:100%; border:none; background:none; padding:15px; color:#999;">Закрити</button></div>`;
             m.onclick = (e) => { if(e.target.id === 'modal') closeM(); };
             document.body.appendChild(m);
         }

@@ -8,15 +8,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #0088cc; --success: #28a745; --bg: #f4f7f9; --text: #333; --warning-bg: #fff9e6; --warning-border: #ffd966; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; user-select: none; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
         
         header { background: white; padding: 15px 0 0; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         h1 { font-size: 18px; margin: 0 0 15px; font-weight: 700; color: #222; }
 
         .menu-wrapper { position: relative; background: white; border-top: 1px solid #eee; overflow: hidden; }
-        .category-menu { display: flex; overflow-x: auto; gap: 8px; padding: 12px 15px; scrollbar-width: none; cursor: grab; -webkit-overflow-scrolling: touch; }
+        .category-menu { 
+            display: flex; 
+            overflow-x: auto; 
+            gap: 8px; 
+            padding: 12px 15px; 
+            scrollbar-width: none; 
+            cursor: grab; 
+            -webkit-overflow-scrolling: touch;
+            user-select: none; /* Чтобы текст не выделялся при перетаскивании */
+        }
         .category-menu::-webkit-scrollbar { display: none; }
-        .category-menu button { white-space: nowrap; padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+        .category-menu:active { cursor: grabbing; }
+        .category-menu button { white-space: nowrap; padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; cursor: pointer; }
 
         #catalog-container { padding: 15px; max-width: 1000px; margin: 0 auto; padding-bottom: 120px; }
         .category-title { text-align: center; margin: 40px 0 20px; font-size: 17px; font-weight: 800; text-transform: uppercase; color: #555; }
@@ -28,7 +38,6 @@
         .price-tag { font-weight: 700; color: var(--success); font-size: 15px; margin-bottom: 10px; }
         .btn-select { background: #0088cc; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
 
-        /* Блок информации о доставке */
         .info-box { background: var(--warning-bg); border: 1px dashed var(--warning-border); padding: 10px; border-radius: 10px; font-size: 12px; margin-bottom: 15px; color: #856404; text-align: left; line-height: 1.4; }
 
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: flex-end; }
@@ -40,12 +49,9 @@
         
         .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid #eee; font-size: 13px; font-weight: 600; }
 
-        /* Стили для выбора количества */
         .qty-box { display: flex; align-items: center; background: #f0f0f0; border-radius: 10px; padding: 5px; width: fit-content; margin: 10px 0; }
         .qty-btn { width: 45px; height: 45px; border: none; background: white; border-radius: 8px; font-size: 22px; font-weight: 700; color: var(--primary); cursor: pointer; -webkit-tap-highlight-color: transparent; }
-        .qty-btn:active { background: #eee; }
-        .qty-input { width: 60px; border: none; background: transparent; text-align: center; font-size: 18px; font-weight: 800; -moz-appearance: textfield; }
-        .qty-input::-webkit-inner-spin-button, .qty-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .qty-input { width: 60px; border: none; background: transparent; text-align: center; font-size: 18px; font-weight: 800; }
 
         .total-box { background: #eef8ff; padding: 15px; border-radius: 12px; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #cce5ff; }
         .total-price { font-size: 20px; font-weight: 800; color: var(--primary); }
@@ -117,7 +123,31 @@
                     return { id: c[0], cat: c[1], name: c[2], img: c[3], l: num(c[4]), xl: num(c[5]), xxl: num(c[6]), xxxl: num(c[7]), velurPrice: num(c[9]), innerPrice: num(c[10]), ecoPrice: num(c[11]), diffPrice: num(c[12]) };
                 }).filter(p => p.id);
                 render();
+                initDragScroll(); // Запуск прокрутки мышкой
             } catch (e) { console.error(e); }
+        }
+
+        // СКРИПТ ПРОКРУТКИ КАТЕГОРИЙ МЫШКОЙ
+        function initDragScroll() {
+            const slider = document.getElementById('main-menu');
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            slider.addEventListener('mousedown', (e) => {
+                isDown = true;
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+            });
+            slider.addEventListener('mouseleave', () => isDown = false);
+            slider.addEventListener('mouseup', () => isDown = false);
+            slider.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - slider.offsetLeft;
+                const walk = (x - startX) * 2; 
+                slider.scrollLeft = scrollLeft - walk;
+            });
         }
 
         function render() {
@@ -192,7 +222,6 @@
             document.getElementById('modal').style.display = 'flex';
         }
 
-        // Логика зажатия кнопок количества
         function startQtyChange(v) { adjustQty(v); qtyInterval = setInterval(() => adjustQty(v), 150); }
         function stopQtyChange() { clearInterval(qtyInterval); }
         function adjustQty(v) {
@@ -222,7 +251,6 @@
             if(!currentP) return;
             let qty = parseInt(document.getElementById('qty-input').value);
             if (isNaN(qty) || qty < 1) qty = 1;
-
             const size = document.getElementById('select-size')?.value || 'l';
             let price = currentP[size];
             if (document.getElementById('select-shape')?.value === 'oval') price += 80;
@@ -230,7 +258,6 @@
             if (fabric === 'velur') price += currentP.velurPrice; if (fabric === 'eco') price += currentP.ecoPrice;
             if (document.getElementById('check-combo')?.checked && currentP.cat !== 'Крісла з вирізом') price += currentP.diffPrice;
             if (document.getElementById('check-inner')?.checked) price += currentP.innerPrice;
-            
             document.getElementById('total-price').innerText = (price * qty) + " грн";
             return price * qty;
         }
@@ -238,11 +265,9 @@
         function addToCart() {
             let qty = parseInt(document.getElementById('qty-input').value);
             if (isNaN(qty) || qty < 1) qty = 1;
-            const sizeEl = document.getElementById('select-size');
-            const shapeEl = document.getElementById('select-shape');
             const item = {
-                name: currentP.name + (shapeEl ? ` (${shapeEl.options[shapeEl.selectedIndex].text.split(' ')[0]})` : ''),
-                size: sizeEl ? sizeEl.options[sizeEl.selectedIndex].text : '',
+                name: currentP.name + (document.getElementById('select-shape') ? ` (${document.getElementById('select-shape').options[document.getElementById('select-shape').selectedIndex].text.split(' ')[0]})` : ''),
+                size: document.getElementById('select-size') ? document.getElementById('select-size').options[document.getElementById('select-size').selectedIndex].text : '',
                 fabric: document.getElementById('select-fabric').options[document.getElementById('select-fabric').selectedIndex].text,
                 color: document.getElementById('select-color').value,
                 color2: document.getElementById('check-combo')?.checked ? document.getElementById('select-color-2').value : null,

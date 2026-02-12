@@ -8,13 +8,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #0088cc; --success: #28a745; --bg: #f4f7f9; --text: #333; --warning-bg: #fff9e6; --warning-border: #ffd966; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; }
         header { background: white; padding: 10px 0 0; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         h1 { font-size: 16px; margin: 0 0 10px; font-weight: 700; color: #222; }
         .menu-wrapper { position: relative; background: white; border-top: 1px solid #eee; overflow: hidden; }
-        .category-menu { display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .category-menu { display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px; scrollbar-width: none; cursor: grab; user-select: none; }
         .category-menu::-webkit-scrollbar { display: none; }
-        .category-menu button { white-space: nowrap; padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 12px; font-weight: 600; flex-shrink: 0; cursor: pointer; }
+        .category-menu button { white-space: nowrap; padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 12px; font-weight: 600; flex-shrink: 0; pointer-events: auto; }
         #catalog-container { padding: 15px; max-width: 1000px; margin: 0 auto; padding-bottom: 120px; }
         .category-title { text-align: center; margin: 30px 0 15px; font-size: 15px; font-weight: 800; text-transform: uppercase; color: #777; }
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -27,14 +27,14 @@
         .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 15px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         .option-group { margin-bottom: 10px; text-align: left; }
         .option-label { font-size: 10px; font-weight: 700; color: #999; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        select { width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #eee; font-size: 14px; font-weight: 600; background: #fafafa; }
+        select { width: 100%; padding: 10px; border-radius: 8px; border: 2px solid #eee; font-size: 14px; font-weight: 600; background: #fafafa; margin-bottom: 5px; }
         .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 6px; cursor: pointer; border: 1px solid #eee; font-size: 12px; font-weight: 600; }
         .qty-box { display: flex; align-items: center; background: #f0f0f0; border-radius: 8px; padding: 4px; width: fit-content; }
-        .qty-btn { width: 40px; height: 40px; border: none; background: white; border-radius: 6px; font-size: 20px; font-weight: 700; color: var(--primary); }
-        .qty-input { width: 40px; border: none; background: transparent; text-align: center; font-size: 16px; font-weight: 800; }
+        .qty-btn { width: 40px; height: 40px; border: none; background: white; border-radius: 6px; font-size: 20px; font-weight: 700; color: var(--primary); cursor: pointer; }
+        .qty-input { width: 50px; border: none; background: transparent; text-align: center; font-size: 16px; font-weight: 800; }
         .total-box { background: #eef8ff; padding: 12px; border-radius: 10px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; }
         .total-price { font-size: 18px; font-weight: 800; color: var(--primary); }
-        #cart-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 350px; background: #222; color: white; border-radius: 50px; display: none; justify-content: space-between; align-items: center; padding: 12px 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 999; }
+        #cart-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 350px; background: #222; color: white; border-radius: 50px; display: none; justify-content: space-between; align-items: center; padding: 12px 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 999; cursor: pointer; }
         .info-box { background: var(--warning-bg); border: 1px dashed var(--warning-border); padding: 8px; border-radius: 8px; font-size: 11px; margin-bottom: 12px; color: #856404; line-height: 1.3; }
     </style>
 </head>
@@ -63,9 +63,7 @@
             eco: [{ n: "ЕК3 Чорний", c: "#1a1a1a" }, { n: "ЕК19 Білий", c: "#ffffff" }]
         };
 
-        let products = [];
-        let currentP = null;
-        let cart = [];
+        let products = [], currentP = null, cart = [];
 
         async function init() {
             try {
@@ -83,6 +81,7 @@
                     };
                 }).filter(p => p && p.id);
                 render();
+                enableDragScroll();
             } catch (e) { console.error(e); }
         }
 
@@ -113,81 +112,57 @@
         function getSizeLabel(key, p) {
             const nl = p.name.toLowerCase();
             const cl = p.cat.toLowerCase();
-            if (nl.includes('мяч') || nl.includes("м'яч")) {
-                const ballSizes = { base: 'L (50 см)', xl: 'XL (70 см)', xxl: 'XXL (100 см)', xxxl: '3XL (130 см)' };
-                return ballSizes[key] || key.toUpperCase();
-            }
+            if (nl.includes('мяч') || nl.includes("м'яч")) return { base: 'L (50 см)', xl: 'XL (70 см)', xxl: 'XXL (100 см)', xxxl: '3XL (130 см)' }[key] || key;
             if (cl.includes('гойдалки')) {
-                if (nl.includes('двомісна')) {
-                    return { base: 'L (80х120 см)', xl: 'XL (80х150 см)', xxl: '2XL (90х180 см)' }[key] || key.toUpperCase();
-                }
-                return { base: 'L (80 см)', xl: 'XL (95 см)' }[key] || key.toUpperCase();
+                if (nl.includes('двомісна')) return { base: 'L (80х120 см)', xl: 'XL (80х150 см)', xxl: '2XL (90х180 см)' }[key] || key;
+                return { base: 'L (80 см)', xl: 'XL (95 см)' }[key] || key;
             }
-            return { base: 'L (85х65 см)', xl: 'XL (105х85 см)', xxl: '2XL (130х90 см)', xxxl: '3XL (140x100 см)', s4xl: '4XL (150x110 см)' }[key] || key.toUpperCase();
+            return { base: 'L (85х65 см)', xl: 'XL (105х85 см)', xxl: '2XL (130х90 см)', xxxl: '3XL (140x100 см)', s4xl: '4XL (150x110 см)' }[key] || key;
         }
 
         function openProduct(id) {
             currentP = products.find(x => x.id === id);
-            const modalBody = document.getElementById('modal-body');
-            const isCutout = currentP.cat.includes('вирізом');
-            const isSwing = currentP.cat.toLowerCase().includes('гойдалки');
-
+            const isCutout = currentP.cat.includes('вирізом'), isSwing = currentP.cat.toLowerCase().includes('гойдалки');
             let sizeOptions = "";
-            ['base', 'xl', 'xxl', 'xxxl', 's4xl'].forEach(key => {
-                if (currentP[key] > 0) sizeOptions += `<option value="${key}" ${key === 'xl' ? 'selected' : ''}>${getSizeLabel(key, currentP)}</option>`;
-            });
+            ['base', 'xl', 'xxl', 'xxxl', 's4xl'].forEach(k => { if (currentP[k] > 0) sizeOptions += `<option value="${k}" ${k === 'xl' ? 'selected' : ''}>${getSizeLabel(k, currentP)}</option>`; });
 
-            modalBody.innerHTML = `
+            document.getElementById('modal-body').innerHTML = `
                 <h3 style="margin:0 0 10px; font-size:16px;">${currentP.name}</h3>
-                <div class="info-box">🚚 4-8 робочих днів.<br>
-                ${isSwing ? '⚠️ <b>Увага:</b> Для Укрпошти підходить лише розбірна модель.' : ''}</div>
-                
+                <div class="info-box">🚚 4-8 роб. днів. ${isSwing ? '<br>⚠️ <b>Для Укрпошти тільки розбірна!</b>' : ''}</div>
                 ${isCutout ? `<div class="option-group"><span class="option-label">Форма:</span><select id="select-shape" onchange="calcTotal()"><option value="grusha">Груша</option><option value="oval">Овал (+80 грн)</option></select></div>` : ''}
                 <div class="option-group"><span class="option-label">Розмір:</span><select id="select-size" onchange="calcTotal()">${sizeOptions}</select></div>
-                
-                ${isSwing ? `<div class="check-item" onclick="toggleCheck('check-swing-mod')"><input type="checkbox" id="check-swing-mod" onchange="calcTotal()"> <span>Гойдалка розбірна (+475 грн)</span></div>` : ''}
-
-                <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()"><option value="oxford">Оксфорд</option>${currentP.velurPrice > 0 ? `<option value="velur">Велюр (+${currentP.velurPrice} грн)</option>` : ''}${currentP.ecoPrice > 0 ? `<option value="eco">Екошкіра (+${currentP.ecoPrice} грн)</option>` : ''}</select></div>
-                <div class="option-group"><span class="option-label">Колір:</span><select id="select-color" onchange="styleSelect(this)"></select></div>
-                
+                ${isSwing ? `<div class="check-item" onclick="toggleCheck('check-swing-mod')"><input type="checkbox" id="check-swing-mod" onchange="calcTotal()"> <span>Розбірна (+475 грн)</span></div>` : ''}
+                <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()"><option value="oxford">Оксфорд</option>${currentP.velurPrice > 0 ? `<option value="velur">Велюр (+${currentP.velurPrice})</option>` : ''}${currentP.ecoPrice > 0 ? `<option value="eco">Екошкіра (+${currentP.ecoPrice})</option>` : ''}</select></div>
+                <div class="option-group"><span class="option-label">Основний колір:</span><select id="select-color" onchange="styleSelect(this)"></select></div>
                 ${isSwing ? `
-                    <div class="check-item" onclick="toggleCheck('check-cushion-other')"><input type="checkbox" id="check-cushion-other"> <span>Подушка іншого кольору (+${currentP.diffPrice} грн)</span></div>
-                    <div class="check-item" onclick="toggleCheck('check-cushion-combo')"><input type="checkbox" id="check-cushion-combo"> <span>Подушка комбінована (+${currentP.diffPrice} грн)</span></div>
-                ` : `
-                    <div class="check-item" onclick="toggleCheck('check-combo')"><input type="checkbox" id="check-combo" ${isCutout ? 'checked' : ''}> <span>Комбінація кольорів (+${currentP.diffPrice} грн)</span></div>
-                `}
+                    <div class="check-item" onclick="toggleCheck('check-cushion-other')"><input type="checkbox" id="check-cushion-other"> <span>Подушка іншого кольору (+${currentP.diffPrice})</span></div>
+                    <div class="check-item" onclick="toggleCheck('check-cushion-combo')"><input type="checkbox" id="check-cushion-combo"> <span>Подушка комбінована (+${currentP.diffPrice})</span></div>
+                ` : `<div class="check-item" onclick="toggleCheck('check-combo')"><input type="checkbox" id="check-combo" ${isCutout ? 'checked' : ''}> <span>Комбінація кольорів (+${currentP.diffPrice})</span></div>`}
                 
-                <div id="second-color-box" class="option-group" style="display:${isCutout ? 'block' : 'none'};">
-                    <span class="option-label">Другий колір:</span><select id="select-color-2" onchange="styleSelect(this)"></select>
+                <div id="extra-colors" style="display:none;">
+                    <div class="option-group"><span class="option-label" id="label-color-2">Другий колір:</span><select id="select-color-2" onchange="styleSelect(this)"></select></div>
+                    <div class="option-group" id="box-color-3" style="display:none;"><span class="option-label">Третій колір:</span><select id="select-color-3" onchange="styleSelect(this)"></select></div>
                 </div>
 
-                ${currentP.innerPrice > 0 ? `<div class="check-item" onclick="toggleCheck('check-inner')"><input type="checkbox" id="check-inner"> <span>Внутрішній чохол (+${currentP.innerPrice} грн)</span></div>` : ''}
-
-                <div class="option-group">
-                    <span class="option-label">Кількість:</span>
-                    <div class="qty-box"><button class="qty-btn" onclick="adjustQty(-1)">-</button><input type="number" id="qty-input" class="qty-input" value="1" readonly><button class="qty-btn" onclick="adjustQty(1)">+</button></div>
-                </div>
+                <div class="option-group"><span class="option-label">Кількість:</span><div class="qty-box"><button class="qty-btn" onclick="adjustQty(-1)">-</button><input type="number" id="qty-input" class="qty-input" value="1" onchange="calcTotal()"><button class="qty-btn" onclick="adjustQty(1)">+</button></div></div>
                 <div class="total-box"><span>Разом:</span><span class="total-price" id="total-price">0 грн</span></div>
                 <button class="btn-select" style="width:100%; padding:15px; font-size:16px;" onclick="addToCart()">Додати до кошика</button>
             `;
-            updateColors();
-            document.getElementById('modal').style.display = 'flex';
+            updateColors(); toggleCheck(); document.getElementById('modal').style.display = 'flex';
         }
 
         function toggleCheck(id) {
-            const ch = document.getElementById(id);
-            if (event.target.tagName !== 'INPUT') ch.checked = !ch.checked;
-            
+            if (id && event.target.tagName !== 'INPUT') document.getElementById(id).checked = !document.getElementById(id).checked;
             const isSwing = currentP.cat.toLowerCase().includes('гойдалки');
-            const secondBox = document.getElementById('second-color-box');
-
+            const extra = document.getElementById('extra-colors');
             if (isSwing) {
-                // Если качеля, показываем второй цвет если выбран любой из "подушечных" чекбоксов
                 const other = document.getElementById('check-cushion-other').checked;
                 const combo = document.getElementById('check-cushion-combo').checked;
-                secondBox.style.display = (other || combo) ? 'block' : 'none';
-            } else if (id === 'check-combo') {
-                secondBox.style.display = ch.checked ? 'block' : 'none';
+                extra.style.display = (other || combo) ? 'block' : 'none';
+                document.getElementById('label-color-2').innerText = combo ? 'Колір подушки 1:' : 'Колір подушки:';
+                document.getElementById('box-color-3').style.display = combo ? 'block' : 'none';
+            } else {
+                extra.style.display = document.getElementById('check-combo')?.checked ? 'block' : 'none';
             }
             calcTotal();
         }
@@ -195,75 +170,73 @@
         function updateColors() {
             const fabric = document.getElementById('select-fabric').value;
             const colors = COLOR_DATABASE[fabric] || COLOR_DATABASE.oxford;
-            const fill = (el) => { 
-                if(!el) return;
+            ['select-color', 'select-color-2', 'select-color-3'].forEach(id => {
+                const el = document.getElementById(id); if (!el) return;
                 el.innerHTML = colors.map(c => `<option value="${c.n}" data-color="${c.c}" style="background:${c.c}">${c.n}</option>`).join('');
                 styleSelect(el);
-            };
-            fill(document.getElementById('select-color')); fill(document.getElementById('select-color-2'));
+            });
         }
 
         function styleSelect(el) {
-            const opt = el.options[el.selectedIndex]; if(!opt) return;
+            const opt = el.options[el.selectedIndex]; if (!opt) return;
             el.style.background = opt.dataset.color;
             const rgb = parseInt(opt.dataset.color.substring(1), 16);
             el.style.color = ((rgb>>16 & 0xff)*0.299 + (rgb>>8 & 0xff)*0.587 + (rgb & 0xff)*0.114) > 150 ? "black" : "white";
             calcTotal();
         }
 
-        function adjustQty(v) { document.getElementById('qty-input').value = Math.max(1, parseInt(document.getElementById('qty-input').value) + v); calcTotal(); }
+        function adjustQty(v) { 
+            const inp = document.getElementById('qty-input');
+            inp.value = Math.max(1, (parseInt(inp.value) || 1) + v);
+            calcTotal(); 
+        }
 
         function calcTotal() {
             if(!currentP) return;
-            let qty = parseInt(document.getElementById('qty-input').value) || 1;
+            let qty = Math.max(1, parseInt(document.getElementById('qty-input').value) || 1);
             let price = currentP[document.getElementById('select-size').value];
             if (document.getElementById('select-shape')?.value === 'oval') price += 80;
             const fabric = document.getElementById('select-fabric').value;
             if (fabric === 'velur') price += currentP.velurPrice;
             if (fabric === 'eco') price += currentP.ecoPrice;
-            
-            const isSwing = currentP.cat.toLowerCase().includes('гойдалки');
-            if (isSwing) {
-                if (document.getElementById('check-cushion-other')?.checked) price += currentP.diffPrice;
-                if (document.getElementById('check-cushion-combo')?.checked) price += currentP.diffPrice;
-                if (document.getElementById('check-swing-mod')?.checked) price += 475;
-            } else {
-                if (document.getElementById('check-combo')?.checked) price += currentP.diffPrice;
-            }
-            
-            if (document.getElementById('check-inner')?.checked) price += currentP.innerPrice;
-            const total = price * qty;
-            document.getElementById('total-price').innerText = total + " грн";
-            return total;
+            if (currentP.cat.toLowerCase().includes('гойдалки')) {
+                if (document.getElementById('check-cushion-other').checked) price += currentP.diffPrice;
+                if (document.getElementById('check-cushion-combo').checked) price += currentP.diffPrice;
+                if (document.getElementById('check-swing-mod').checked) price += 475;
+            } else if (document.getElementById('check-combo')?.checked) price += currentP.diffPrice;
+            document.getElementById('total-price').innerText = (price * qty) + " грн";
+            return price * qty;
         }
 
         function addToCart() {
             let name = currentP.name;
             if (document.getElementById('check-swing-mod')?.checked) name += " (РОЗБІРНА)";
-            const isSwing = currentP.cat.toLowerCase().includes('гойдалки');
-            let colorInfo = document.getElementById('select-color').value;
-            const comboChecked = isSwing ? (document.getElementById('check-cushion-other').checked || document.getElementById('check-cushion-combo').checked) : document.getElementById('check-combo').checked;
-            if (comboChecked) colorInfo += " + " + document.getElementById('select-color-2').value;
-
-            cart.push({
-                name: name,
-                size: document.getElementById('select-size').options[document.getElementById('select-size').selectedIndex].text,
-                fabric: document.getElementById('select-fabric').options[document.getElementById('select-fabric').selectedIndex].text,
-                color: colorInfo,
-                qty: parseInt(document.getElementById('qty-input').value),
-                price: calcTotal()
-            });
+            let colors = document.getElementById('select-color').value;
+            if (document.getElementById('extra-colors').style.display !== 'none') {
+                colors += " + " + document.getElementById('select-color-2').value;
+                if (document.getElementById('box-color-3').style.display !== 'none') colors += " + " + document.getElementById('select-color-3').value;
+            }
+            cart.push({ name: name, size: document.getElementById('select-size').options[document.getElementById('select-size').selectedIndex].text, fabric: document.getElementById('select-fabric').value, color: colors, qty: parseInt(document.getElementById('qty-input').value), price: calcTotal() });
             document.getElementById('modal').style.display = 'none';
             updateCartBar();
         }
 
         function updateCartBar() {
             const bar = document.getElementById('cart-bar');
+            bar.style.display = cart.length > 0 ? 'flex' : 'none';
             if (cart.length > 0) {
-                bar.style.display = 'flex';
                 document.getElementById('cart-count').innerText = cart.length;
                 document.getElementById('cart-total-bar').innerText = cart.reduce((s, i) => s + i.price, 0) + " грн";
-            } else { bar.style.display = 'none'; }
+            }
+        }
+
+        function enableDragScroll() {
+            const slider = document.querySelector('.category-menu');
+            let isDown = false, startX, scrollLeft;
+            slider.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
+            slider.addEventListener('mouseleave', () => isDown = false);
+            slider.addEventListener('mouseup', () => isDown = false);
+            slider.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 2; slider.scrollLeft = scrollLeft - walk; });
         }
 
         function createModal() {

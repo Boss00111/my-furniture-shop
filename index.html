@@ -53,7 +53,7 @@
     </header>
     <div id="catalog-container">Завантаження...</div>
     <div id="cart-bar" onclick="showCart()">
-        <div style="display:flex; align-items:center;"><span>Кошик</span><span id="cart-count">0</span></div>
+        <div style="display:flex; align-items:center;"><span>Кошик</span><span id="cart-count" style="margin-left:8px; background:var(--primary); padding:2px 8px; border-radius:10px; font-size:12px;">0</span></div>
         <span id="cart-total-bar" style="font-weight:700;">0 грн</span>
     </div>
     <div id="cart-modal">
@@ -96,23 +96,13 @@
                     return { id: c[0], cat: c[1], name: c[2], img: c[3], l: num(c[4]), xl: num(c[5]), xxl: num(c[6]), xxxl: num(c[7]), velurPrice: num(c[9]), innerPrice: num(c[10]), ecoPrice: num(c[11]), diffPrice: num(c[12]) };
                 }).filter(p => p.id);
                 render();
-                initDragScroll();
             } catch (e) { console.error(e); }
-        }
-
-        function initDragScroll() {
-            const slider = document.getElementById('main-menu');
-            let isDown = false, startX, scrollLeft;
-            slider.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
-            slider.addEventListener('mouseleave', () => isDown = false);
-            slider.addEventListener('mouseup', () => isDown = false);
-            slider.addEventListener('mousemove', (e) => { if (!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 2; slider.scrollLeft = scrollLeft - walk; });
         }
 
         function render() {
             const menu = document.getElementById('main-menu');
             const catalog = document.getElementById('catalog-container');
-            catalog.innerHTML = "";
+            catalog.innerHTML = ""; menu.innerHTML = "";
             const grouped = {};
             products.forEach(p => { if (!grouped[p.cat]) grouped[p.cat] = []; grouped[p.cat].push(p); });
 
@@ -137,13 +127,14 @@
             const nl = p.name.toLowerCase();
             const cat = p.cat.toLowerCase();
             
-            if (nl.includes('мяч')) {
+            // Исправленная проверка для мяча (с учетом апострофа)
+            if (nl.includes('мяч') || nl.includes("м'яч")) {
                 if (key === 'l') return 'L (50 см)';
                 if (key === 'xl') return 'XL (70 см)';
                 if (key === 'xxl') return 'XXL (100 см)';
                 if (key === 'xxxl') return '3XL (130 см)';
             }
-            if (cat.includes('гойдалка')) {
+            if (cat.includes('гойдалка') || nl.includes('гойдалка')) {
                 if (nl.includes('двомісна')) {
                     if (key === 'l') return 'L (80х120 см)';
                     if (key === 'xl') return 'XL (80х150 см)';
@@ -161,7 +152,7 @@
             currentP = products.find(x => x.id === id);
             const modalBody = document.getElementById('modal-body');
             const isCutout = currentP.cat === 'Крісла з вирізом';
-            const isSwing = currentP.cat.toLowerCase().includes('гойдалка');
+            const isSwing = currentP.cat.toLowerCase().includes('гойдалка') || currentP.name.toLowerCase().includes('гойдалка');
             
             let sizeOptions = "";
             ['l', 'xl', 'xxl', 'xxxl'].forEach(key => {
@@ -177,7 +168,7 @@
                 ${isCutout ? `<div class="option-group"><span class="option-label">Форма:</span><select id="select-shape" onchange="calcTotal()"><option value="grusha">Груша</option><option value="oval">Овал (+80 грн)</option></select></div>` : ''}
                 ${sizeOptions ? `<div class="option-group"><span class="option-label">Розмір:</span><select id="select-size" onchange="calcTotal()">${sizeOptions}</select></div>` : ''}
                 
-                ${isSwing ? `<div class="check-item" onclick="toggleCheck('check-swing-mod')"><input type="checkbox" id="check-swing-mod"> <span>Гойдалка розбірна (+475 грн)</span></div>` : ''}
+                ${isSwing ? `<div class="check-item" onclick="toggleCheck('check-swing-mod')"><input type="checkbox" id="check-swing-mod" onchange="calcTotal()"> <span>Гойдалка розбірна (+475 грн)</span></div>` : ''}
 
                 <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()"><option value="oxford">Оксфорд</option>${currentP.velurPrice > 0 ? `<option value="velur">Велюр (+${currentP.velurPrice} грн)</option>` : ''}${currentP.ecoPrice > 0 ? `<option value="eco">Екошкіра (+${currentP.ecoPrice} грн)</option>` : ''}</select></div>
                 <div class="option-group"><span class="option-label">Колір:</span><select id="select-color" onchange="styleSelect(this)"></select></div>
@@ -192,9 +183,9 @@
                 <div class="option-group">
                     <span class="option-label">Кількість:</span>
                     <div class="qty-box">
-                        <button class="qty-btn" onmousedown="startQtyChange(-1)" onmouseup="stopQtyChange()" ontouchstart="startQtyChange(-1)" ontouchend="stopQtyChange()">-</button>
+                        <button class="qty-btn" onclick="adjustQty(-1)">-</button>
                         <input type="number" id="qty-input" class="qty-input" value="1" oninput="calcTotal()">
-                        <button class="qty-btn" onmousedown="startQtyChange(1)" onmouseup="stopQtyChange()" ontouchstart="startQtyChange(1)" ontouchend="stopQtyChange()">+</button>
+                        <button class="qty-btn" onclick="adjustQty(1)">+</button>
                     </div>
                 </div>
 
@@ -205,8 +196,6 @@
             document.getElementById('modal').style.display = 'flex';
         }
 
-        function startQtyChange(v) { adjustQty(v); qtyInterval = setInterval(() => adjustQty(v), 150); }
-        function stopQtyChange() { clearInterval(qtyInterval); }
         function adjustQty(v) {
             const input = document.getElementById('qty-input');
             let current = parseInt(input.value) || 1;
@@ -215,7 +204,8 @@
         }
 
         function toggleCheck(id) {
-            const ch = document.getElementById(id); ch.checked = !ch.checked;
+            const ch = document.getElementById(id); 
+            if (event.target.tagName !== 'INPUT') ch.checked = !ch.checked;
             if (id === 'check-combo') document.getElementById('second-color-box').style.display = ch.checked ? 'block' : 'none';
             calcTotal();
         }
@@ -242,8 +232,9 @@
             if (document.getElementById('check-inner')?.checked) price += currentP.innerPrice;
             if (document.getElementById('check-swing-mod')?.checked) price += 475;
             
-            document.getElementById('total-price').innerText = (price * qty) + " грн";
-            return price * qty;
+            const total = price * qty;
+            document.getElementById('total-price').innerText = total + " грн";
+            return total;
         }
 
         function addToCart() {
@@ -266,7 +257,7 @@
         }
 
         function updateCartBar() { const bar = document.getElementById('cart-bar'); if (cart.length > 0) { bar.style.display = 'flex'; document.getElementById('cart-count').innerText = cart.length; document.getElementById('cart-total-bar').innerText = cart.reduce((s, i) => s + i.price, 0) + " грн"; } else { bar.style.display = 'none'; } }
-        function showCart() { const list = document.getElementById('cart-items-list'); list.innerHTML = ''; cart.forEach((item, idx) => { list.innerHTML += `<div class="cart-item"><button class="remove-btn" onclick="removeItem(${idx})">&times;</button><div style="font-weight:700; font-size:15px;">${item.name} (${item.qty} шт)</div><div style="font-size:12px; color:#666;">${item.size}, ${item.fabric}, ${item.color}${item.color2 ? ' + '+item.color2 : ''}</div><div style="font-weight:700; color:#0088cc;">${item.price} грн</div></div>`; }); document.getElementById('cart-final-total').innerText = cart.reduce((s, i) => s + i.price, 0) + " грн"; document.getElementById('cart-modal').style.display = 'flex'; }
+        function showCart() { const list = document.getElementById('cart-items-list'); list.innerHTML = ''; cart.forEach((item, idx) => { list.innerHTML += `<div class="cart-item"><button class="remove-btn" onclick="removeItem(${idx})">&times;</button><div style="font-weight:700; font-size:15px;">${item.name} (${item.qty} шт)</div><div style="font-size:12px; color:#666;">${item.size}, ${item.fabric}, ${item.color}${item.color2 ? ' + '+item.color2 : ''}${item.inner ? ', з чохлом' : ''}</div><div style="font-weight:700; color:#0088cc;">${item.price} грн</div></div>`; }); document.getElementById('cart-final-total').innerText = cart.reduce((s, i) => s + i.price, 0) + " грн"; document.getElementById('cart-modal').style.display = 'flex'; }
         function hideCart() { document.getElementById('cart-modal').style.display = 'none'; }
         function removeItem(idx) { cart.splice(idx, 1); if (cart.length === 0) hideCart(); updateCartBar(); showCart(); }
 
@@ -277,11 +268,11 @@
                 if (item.inner) s += `, +Внутр. чохол`;
                 s += `) - ${item.price} грн`;
                 return s;
-            }).join(', ');
+            }).join('; ');
             tg.sendData(JSON.stringify({ items: itemsString, totalPrice: cart.reduce((s, i) => s + i.price, 0), totalQty: cart.reduce((s, i) => s + i.qty, 0) }));
         }
 
-        function createModal() { if(document.getElementById('modal')) return; const m = document.createElement('div'); m.id = 'modal'; m.innerHTML = `<div class="modal-content"><div id="modal-body"></div><button onclick="closeM()" style="width:100%; border:none; background:none; padding:15px; color:#999;">Закрити</button></div>`; m.onclick = (e) => { if(e.target.id === 'modal') closeM(); }; document.body.appendChild(m); }
+        function createModal() { if(document.getElementById('modal')) return; const m = document.createElement('div'); m.id = 'modal'; m.innerHTML = `<div class="modal-content"><div id="modal-body"></div><button onclick="closeM()" style="width:100%; border:none; background:none; padding:15px; color:#999; font-weight:600;">Скасувати</button></div>`; m.onclick = (e) => { if(e.target.id === 'modal') closeM(); }; document.body.appendChild(m); }
         function closeM() { document.getElementById('modal').style.display = 'none'; }
         init();
     </script>

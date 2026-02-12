@@ -8,14 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #0088cc; --success: #28a745; --bg: #f4f7f9; --text: #333; --warning-bg: #fff9e6; --warning-border: #ffd966; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
         header { background: white; padding: 15px 0 0; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         h1 { font-size: 18px; margin: 0 0 15px; font-weight: 700; color: #222; }
         
         .menu-wrapper { position: relative; background: white; border-top: 1px solid #eee; overflow: hidden; }
         .category-menu { display: flex; overflow-x: auto; gap: 8px; padding: 12px 15px; scrollbar-width: none; -webkit-overflow-scrolling: touch; cursor: grab; user-select: none; }
         .category-menu::-webkit-scrollbar { display: none; }
-        .category-menu button { white-space: nowrap; padding: 10px 18px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; cursor: pointer; }
+        .category-menu button { white-space: nowrap; padding: 10px 22px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 13px; font-weight: 600; flex-shrink: 0; cursor: pointer; }
         
         #catalog-container { padding: 15px; max-width: 1000px; margin: 0 auto; padding-bottom: 120px; }
         .category-title { text-align: center; margin: 40px 0 20px; font-size: 17px; font-weight: 800; text-transform: uppercase; color: #555; }
@@ -26,9 +26,9 @@
         .price-tag { font-weight: 700; color: var(--success); font-size: 15px; margin-bottom: 10px; }
         .btn-select { background: #0088cc; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
         
-        .info-box { background: var(--warning-bg); border: 1px dashed var(--warning-border); padding: 10px; border-radius: 10px; font-size: 12px; margin-bottom: 15px; color: #856404; text-align: left; line-height: 1.4; }
+        .info-box { background: var(--warning-bg); border: 1px dashed var(--warning-border); padding: 10px; border-radius: 10px; font-size: 12px; margin-bottom: 15px; color: #856404; text-align: left; }
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: flex-end; }
-        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; max-height: 95vh; overflow-y: auto; }
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; max-height: 90vh; overflow-y: auto; }
         
         .option-group { margin-bottom: 12px; text-align: left; }
         .option-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; margin-bottom: 6px; display: block; }
@@ -36,19 +36,13 @@
         .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid #eee; font-size: 13px; font-weight: 600; }
         
         .qty-box { display: flex; align-items: center; background: #f0f0f0; border-radius: 10px; padding: 5px; width: fit-content; }
-        .qty-btn { width: 40px; height: 40px; border: none; background: white; border-radius: 8px; font-size: 20px; font-weight: 700; color: var(--primary); cursor: pointer; }
+        .qty-btn { width: 40px; height: 40px; border: none; background: white; border-radius: 8px; font-size: 20px; font-weight: 700; color: var(--primary); }
         .qty-input { width: 50px; border: none; background: transparent; text-align: center; font-size: 16px; font-weight: 800; }
         
-        .total-box { background: #eef8ff; padding: 15px; border-radius: 12px; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #cce5ff; }
+        .total-box { background: #eef8ff; padding: 15px; border-radius: 12px; margin: 15px 0; display: flex; justify-content: space-between; align-items: center; }
         .total-price { font-size: 20px; font-weight: 800; color: var(--primary); }
         
-        #cart-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 350px; background: #222; color: white; border-radius: 50px; display: none; justify-content: space-between; align-items: center; padding: 12px 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 999; cursor: pointer; }
-        #cart-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1100; flex-direction: column; }
-        .cart-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .cart-items { flex: 1; overflow-y: auto; padding: 15px; }
-        .cart-item { border-bottom: 1px solid #f0f0f0; padding: 15px 0; position: relative; }
-        .remove-btn { position: absolute; right: 0; top: 12px; color: #ff4444; border: none; background: #fff1f1; width: 30px; height: 30px; border-radius: 50%; font-size: 20px; }
-        .btn-order { background: #0088cc; color: white; border: none; width: 100%; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; }
+        #cart-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 350px; background: #222; color: white; border-radius: 50px; display: none; justify-content: space-between; align-items: center; padding: 12px 25px; z-index: 999; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -65,28 +59,21 @@
         <span id="cart-total-bar" style="font-weight:700;">0 грн</span>
     </div>
 
-    <div id="cart-modal">
-        <div class="cart-header">
-            <h2 style="margin:0; font-size: 20px;">Ваше замовлення</h2>
-            <button onclick="hideCart()" style="border:none; background:none; font-size:30px; color:#ccc;">&times;</button>
-        </div>
-        <div class="cart-items" id="cart-items-list"></div>
-        <div class="cart-footer" style="padding: 20px;">
-            <div class="total-box"><span>Разом:</span><span id="cart-final-total" class="total-price">0 грн</span></div>
-            <button class="btn-order" onclick="sendAllToTelegram()">Оформити замовлення</button>
+    <div id="modal">
+        <div class="modal-content">
+            <div id="modal-body"></div>
+            <button onclick="closeM()" style="width:100%; border:none; background:none; padding:15px; color:#999; font-weight:600;">Скасувати</button>
         </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand();
-
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/1Kd4ODQgS8QOFHOg2k4lCvRgizqSRnY17qiaStmV6BNY/export?format=csv&gid=415679695';
 
         const COLOR_DATABASE = {
             oxford: [{ n: "2 - коричневий", c: "#4B2D0E" }, { n: "3 - какао", c: "#A38A75" }, { n: "4 - бежевий", c: "#F5F5DC" }, { n: "4/1 - пісочний", c: "#C2B280" }, { n: "4/2 - пудровий", c: "#DEB887" }, { n: "5 - електрик", c: "#0000FF" }, { n: "6 - трава", c: "#008000" }, { n: "7 - малина", c: "#E30B5D" }, { n: "8 - темно-синій", c: "#000080" }, { n: "9 - блакитний", c: "#00BFFF" }, { n: "10 - фіолетовий", c: "#800080" }, { n: "11 - м'ята", c: "#3EB489" }, { n: "12 - червоний", c: "#FF0000" }, { n: "13 - гірчичний", c: "#E1AD01" }, { n: "14 - жовтий", c: "#FFD700" }, { n: "14/1 - жовтогарячий", c: "#FF8C00" }, { n: "15 - сірий", c: "#808080" }, { n: "17 - темно-сірий", c: "#4F4F4F" }, { n: "18 - вино", c: "#722F37" }, { n: "19 - блакитний світлий", c: "#ADD8E6" }, { n: "20 - білий", c: "#FFFFFF" }, { n: "21 - рожевий пиловий", c: "#C08081" }, { n: "22 - оранжевий", c: "#FFA500" }, { n: "26 - салат", c: "#7CFC00" }, { n: "27 - бузок", c: "#C8A2C8" }, { n: "28 - темно-зелений", c: "#006400" }, { n: "29 - хакі", c: "#C3B091" }, { n: "30 - чорний", c: "#000000" }, { n: "32 - рожевий (Барбі)", c: "#DA1884" }],
             eco: [{ n: "ЕК3 Чорний", c: "#1a1a1a" }, { n: "ЕК19 Білий", c: "#ffffff" }],
-            velur: [{ n: "Багіра 14 (Rose)", c: "#d3a3b1" }, { n: "Багіра 19 (Opal)", c: "#8e8e91" }, { n: "Багіра 20 (Ash)", c: "#3c3f4a" }, { n: "Жасмін 02 (Beige)", c: "#e5ddd3" }, { n: "Жасмін 91 (Grey)", c: "#9c9ba0" }, { n: "Жасмін 95 (Dark Grey)", c: "#5a5b5d" }, { n: "Жасмін  black (Black)", c: "#1d1d1b" }]
+            velur: [{ n: "Багіра 14 (Rose)", c: "#d3a3b1" }, { n: "Багіра 19 (Opal)", c: "#8e8e91" }, { n: "Багіра 20 (Ash)", c: "#3c3f4a" }, { n: "Жасмін 02 (Beige)", c: "#e5ddd3" }, { n: "Жасмін 91 (Grey)", c: "#9c9ba0" }, { n: "Жасмін 95 (Dark Grey)", c: "#5a5b5d" }, { n: "Жасмін black (Black)", c: "#1d1d1b" }]
         };
 
         let products = [];
@@ -108,15 +95,15 @@
                     };
                 }).filter(p => p.id);
                 render();
-                initMenuScroll();
-            } catch (e) { console.error(e); }
+                initMenuDrag();
+            } catch (e) { document.getElementById('catalog-container').innerText = "Помилка завантаження..."; }
         }
 
-        function initMenuScroll() {
+        function initMenuDrag() {
             const slider = document.getElementById('main-menu');
-            let isDown = false; let startX; let scrollLeft;
+            let isDown = false, startX, scrollLeft;
             slider.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; slider.style.cursor = 'grabbing'; });
-            slider.addEventListener('mouseleave', () => { isDown = false; slider.style.cursor = 'grab'; });
+            slider.addEventListener('mouseleave', () => { isDown = false; });
             slider.addEventListener('mouseup', () => { isDown = false; slider.style.cursor = 'grab'; });
             slider.addEventListener('mousemove', (e) => { if (!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 2; slider.scrollLeft = scrollLeft - walk; });
         }
@@ -142,7 +129,6 @@
                 });
                 catalog.innerHTML += html + `</div></section>`;
             });
-            createModal();
         }
 
         function getSizeLabel(key, p) {
@@ -163,26 +149,26 @@
                     if (key === 'xl') return 'XL (95 см)';
                 }
             }
-            const defaultLabels = { l: 'L (85х65 см)', xl: 'XL (105х85 см)', xxl: '2XL (130х90 см)', xxxl: '3XL (140x100 см)', '4xl': '4XL (150x110 см)' };
-            return defaultLabels[key] || key.toUpperCase();
+            const d = { l:'L (85х65 см)', xl:'XL (105х85 см)', xxl:'2XL (130х90 см)', xxxl:'3XL (140x100 см)', '4xl':'4XL (150x110 см)' };
+            return d[key] || key.toUpperCase();
         }
 
         function openProduct(id) {
             currentP = products.find(x => x.id === id);
-            const modalBody = document.getElementById('modal-body');
+            const body = document.getElementById('modal-body');
             const isCutout = currentP.cat === 'Крісла з вирізом';
-            const isSwing = currentP.cat.toLowerCase().includes('гойдалка') || currentP.name.toLowerCase().includes('гойдалка');
+            const isSwing = currentP.cat.toLowerCase().includes('гойдалка');
             
             let sizeOptions = "";
-            ['l', 'xl', 'xxl', 'xxxl', '4xl'].forEach(key => {
-                if (currentP[key] > 0) sizeOptions += `<option value="${key}" ${key === 'xl' ? 'selected' : ''}>${getSizeLabel(key, currentP)}</option>`;
+            ['l', 'xl', 'xxl', 'xxxl', '4xl'].forEach(k => {
+                if (currentP[k] > 0) sizeOptions += `<option value="${k}" ${k==='xl'?'selected':''}>${getSizeLabel(k, currentP)}</option>`;
             });
 
-            modalBody.innerHTML = `
-                <h2 style="margin:0 0 15px; font-size:18px;">${currentP.name}</h2>
-                <div class="info-box">🚚 <b>Термін:</b> Відправка протягом <b>4-8 робочих днів</b>.</div>
+            body.innerHTML = `
+                <h2 style="margin:0 0 10px;">${currentP.name}</h2>
+                <div class="info-box">🚚 Відправка протягом 4-8 робочих днів.</div>
                 
-                ${isSwing ? `<div class="info-box" style="background:#fff3cd; border:1px dashed #ffeeba; color:#856404;">⚠️ Даний товар не проходить для відправки Укрпоштою (підходять лише розбірні моделі).</div>` : ''}
+                ${isSwing ? `<div class="info-box" style="background:#fff3cd; color:#856404; border:1px dashed #ffeeba;">⚠️ Не проходить на Укрпошту (тільки розбірні моделі).</div>` : ''}
 
                 ${isCutout ? `<div class="option-group"><span class="option-label">Форма:</span><select id="select-shape" onchange="calcTotal()"><option value="grusha">Груша</option><option value="oval">Овал (+80 грн)</option></select></div>` : ''}
                 
@@ -191,15 +177,16 @@
                 ${isSwing ? `<div class="check-item" onclick="toggleCheck('check-swing-mod')"><input type="checkbox" id="check-swing-mod" onchange="calcTotal()"> <span>Гойдалка розбірна (+475 грн)</span></div>` : ''}
 
                 <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()"><option value="oxford">Оксфорд</option>${currentP.velurPrice > 0 ? `<option value="velur">Велюр (+${currentP.velurPrice} грн)</option>` : ''}${currentP.ecoPrice > 0 ? `<option value="eco">Екошкіра (+${currentP.ecoPrice} грн)</option>` : ''}</select></div>
+                
                 <div class="option-group"><span class="option-label">Колір:</span><select id="select-color" onchange="styleSelect(this)"></select></div>
                 
                 <div class="check-item" onclick="toggleCheck('check-combo')">
                     <input type="checkbox" id="check-combo" ${isCutout ? 'checked' : ''}> <span>Комбінація кольорів</span>
                 </div>
 
-                ${currentP.innerPrice > 0 ? `<div class="check-item" onclick="toggleCheck('check-inner')"><input type="checkbox" id="check-inner"> <span>Внутрішній чохол (+${currentP.innerPrice} грн)</span></div>` : ''}
-                
                 <div id="second-color-box" class="option-group" style="display:${isCutout ? 'block' : 'none'};"><span class="option-label">Другий колір:</span><select id="select-color-2" onchange="styleSelect(this)"></select></div>
+
+                ${currentP.innerPrice > 0 ? `<div class="check-item" onclick="toggleCheck('check-inner')"><input type="checkbox" id="check-inner"> <span>Внутрішній чохол (+${currentP.innerPrice} грн)</span></div>` : ''}
                 
                 <div class="option-group">
                     <span class="option-label">Кількість:</span>
@@ -207,30 +194,43 @@
                 </div>
 
                 <div class="total-box"><span>Разом:</span><span class="total-price" id="total-price">0 грн</span></div>
-                <button class="btn-order" onclick="addToCart()">Додати до кошика</button>
+                <button class="btn-select" style="width:100%; padding:15px; font-size:16px;" onclick="addToCart()">Додати до кошика</button>
             `;
             updateColors();
             document.getElementById('modal').style.display = 'flex';
         }
 
-        function adjustQty(v) { const input = document.getElementById('qty-input'); input.value = Math.max(1, parseInt(input.value) + v); calcTotal(); }
-        
-        function toggleCheck(id) { 
-            const ch = document.getElementById(id); 
-            if (event.target.tagName !== 'INPUT') ch.checked = !ch.checked;
-            if (id === 'check-combo') document.getElementById('second-color-box').style.display = ch.checked ? 'block' : 'none';
-            calcTotal(); 
+        function styleSelect(el) {
+            if(!el || !el.options[el.selectedIndex]) return;
+            const color = el.options[el.selectedIndex].dataset.color;
+            el.style.backgroundColor = color;
+            if(color) {
+                const rgb = parseInt(color.substring(1), 16);
+                const r = (rgb >> 16) & 0xff, g = (rgb >> 8) & 0xff, b = rgb & 0xff;
+                el.style.color = (r*0.299 + g*0.587 + b*0.114) > 150 ? "#000" : "#fff";
+            }
+            calcTotal();
         }
 
         function updateColors() {
-            const fabric = document.getElementById('select-fabric').value;
-            const colors = COLOR_DATABASE[fabric];
-            const fill = (el) => { if(!el) return; el.innerHTML = ""; colors.forEach(c => { const opt = document.createElement('option'); opt.value = c.n; opt.innerText = c.n; opt.dataset.color = c.c; opt.style.backgroundColor = c.c; el.appendChild(opt); }); styleSelect(el); };
+            const f = document.getElementById('select-fabric').value;
+            const colors = COLOR_DATABASE[f] || [];
+            const fill = (el) => {
+                if(!el) return; el.innerHTML = "";
+                colors.forEach(c => { const o = document.createElement('option'); o.value = c.n; o.innerText = c.n; o.dataset.color = c.c; o.style.backgroundColor = c.c; el.appendChild(o); });
+                styleSelect(el);
+            };
             fill(document.getElementById('select-color')); fill(document.getElementById('select-color-2'));
         }
 
-        function styleSelect(el) { if(!el || !el.options[el.selectedIndex]) return; const color = el.options[el.selectedIndex].dataset.color; el.style.backgroundColor = color; el.style.color = isDark(color) ? "white" : "black"; calcTotal(); }
-        function isDark(color) { const rgb = parseInt(color.substring(1), 16); return ((rgb >> 16) & 0xff)*0.2126 + ((rgb >> 8) & 0xff)*0.7152 + (rgb & 0xff)*0.0722 < 140; }
+        function toggleCheck(id) { 
+            const ch = document.getElementById(id); 
+            if(event.target.tagName !== 'INPUT') ch.checked = !ch.checked;
+            if(id === 'check-combo') document.getElementById('second-color-box').style.display = ch.checked ? 'block' : 'none';
+            calcTotal(); 
+        }
+
+        function adjustQty(v) { const i = document.getElementById('qty-input'); i.value = Math.max(1, parseInt(i.value) + v); calcTotal(); }
 
         function calcTotal() {
             if(!currentP) return;
@@ -243,7 +243,6 @@
             if (document.getElementById('check-inner')?.checked) base += currentP.innerPrice;
             if (document.getElementById('check-combo')?.checked && currentP.cat !== 'Крісла з вирізом') base += (currentP.diffPrice || 0);
             if (document.getElementById('check-swing-mod')?.checked) base += 475;
-            
             const total = base * qty;
             document.getElementById('total-price').innerText = total + " грн";
             return total;
@@ -253,29 +252,26 @@
             const qty = parseInt(document.getElementById('qty-input').value);
             let name = currentP.name;
             if (document.getElementById('check-swing-mod')?.checked) name += " (РОЗБІРНА)";
-            const item = {
+            cart.push({
                 name: name,
                 size: document.getElementById('select-size').options[document.getElementById('select-size').selectedIndex].text,
                 fabric: document.getElementById('select-fabric').options[document.getElementById('select-fabric').selectedIndex].text,
                 color: document.getElementById('select-color').value,
                 color2: document.getElementById('check-combo')?.checked ? document.getElementById('select-color-2').value : null,
-                qty: qty,
-                price: calcTotal()
-            };
-            cart.push(item); closeM(); updateCartBar();
+                qty: qty, price: calcTotal()
+            });
+            closeM(); updateCartBar();
         }
 
-        function updateCartBar() { const b = document.getElementById('cart-bar'); if(cart.length){ b.style.display='flex'; document.getElementById('cart-count').innerText=cart.length; document.getElementById('cart-total-bar').innerText=cart.reduce((s,i)=>s+i.price,0)+' грн'; } else b.style.display='none'; }
-        function showCart() { const list = document.getElementById('cart-items-list'); list.innerHTML=''; cart.forEach((item,i)=>{ list.innerHTML+=`<div class="cart-item"><button class="remove-btn" onclick="removeItem(${i})">&times;</button><b>${item.name} x${item.qty}</b><br><small>${item.size}, ${item.fabric}, ${item.color}${item.color2?'+'+item.color2:''}</small><br><span style="color:var(--primary)">${item.price} грн</span></div>`; }); document.getElementById('cart-final-total').innerText=cart.reduce((s,i)=>s+i.price,0)+' грн'; document.getElementById('cart-modal').style.display='flex'; }
-        function hideCart() { document.getElementById('cart-modal').style.display='none'; }
-        function removeItem(i) { cart.splice(i,1); if(!cart.length) hideCart(); updateCartBar(); showCart(); }
-
-        function sendAllToTelegram() {
-            const data = cart.map(i => `${i.name} x${i.qty} (${i.size}, ${i.fabric}, ${i.color}${i.color2?'+'+i.color2:''}) - ${i.price}грн`).join('\n');
-            tg.sendData(JSON.stringify({ order: data, total: cart.reduce((s,i)=>s+i.price,0) }));
+        function updateCartBar() { 
+            const b = document.getElementById('cart-bar');
+            if(cart.length) {
+                b.style.display='flex'; 
+                document.getElementById('cart-count').innerText=cart.length; 
+                document.getElementById('cart-total-bar').innerText=cart.reduce((s,i)=>s+i.price,0)+' грн';
+            } else b.style.display='none';
         }
-
-        function createModal() { if(document.getElementById('modal')) return; const m = document.createElement('div'); m.id = 'modal'; m.innerHTML = `<div class="modal-content"><div id="modal-body"></div><button onclick="closeM()" style="width:100%; border:none; background:none; padding:15px; color:#999; font-weight:600;">Скасувати</button></div>`; m.onclick = (e) => { if(e.target.id === 'modal') closeM(); }; document.body.appendChild(m); }
+        
         function closeM() { document.getElementById('modal').style.display = 'none'; }
         init();
     </script>

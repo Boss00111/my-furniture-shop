@@ -127,7 +127,6 @@
             const nl = p.name.toLowerCase();
             const cat = p.cat.toLowerCase();
             
-            // Исправленная проверка для мяча (с учетом апострофа)
             if (nl.includes('мяч') || nl.includes("м'яч")) {
                 if (key === 'l') return 'L (50 см)';
                 if (key === 'xl') return 'XL (70 см)';
@@ -172,13 +171,14 @@
 
                 <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()"><option value="oxford">Оксфорд</option>${currentP.velurPrice > 0 ? `<option value="velur">Велюр (+${currentP.velurPrice} грн)</option>` : ''}${currentP.ecoPrice > 0 ? `<option value="eco">Екошкіра (+${currentP.ecoPrice} грн)</option>` : ''}</select></div>
                 <div class="option-group"><span class="option-label">Колір:</span><select id="select-color" onchange="styleSelect(this)"></select></div>
+                
                 <div id="extra-options">
-                    <div class="check-item" onclick="toggleCheck('check-combo')" ${isCutout ? 'style="pointer-events:none; opacity:0.8;"' : ''}>
+                    <div class="check-item" onclick="toggleCheck('check-combo')">
                         <input type="checkbox" id="check-combo" ${isCutout ? 'checked' : ''}> <span>Комбінація кольорів</span>
                     </div>
                     ${currentP.innerPrice > 0 ? `<div class="check-item" onclick="toggleCheck('check-inner')"><input type="checkbox" id="check-inner"> <span>Внутрішній чохол (+${currentP.innerPrice} грн)</span></div>` : ''}
                 </div>
-                <div id="second-color-box" class="option-group" style="display:${isCutout ? 'block' : 'none'};"><span class="option-label">Колір вставки:</span><select id="select-color-2" onchange="styleSelect(this)"></select></div>
+                <div id="second-color-box" class="option-group" style="display:${isCutout ? 'block' : 'none'};"><span class="option-label">Другий колір:</span><select id="select-color-2" onchange="styleSelect(this)"></select></div>
                 
                 <div class="option-group">
                     <span class="option-label">Кількість:</span>

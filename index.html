@@ -114,7 +114,7 @@
             const cl = p.cat.toLowerCase();
             if (nl.includes('мяч') || nl.includes("м'яч")) return { base: 'L (50 см)', xl: 'XL (70 см)', xxl: 'XXL (100 см)', xxxl: '3XL (130 см)' }[key] || key;
             if (cl.includes('гойдалки')) {
-                if (nl.includes('двомісна')) return { base: 'L (80х120 см)', xl: 'XL (80х150 см)', xxl: '2XL (90х180 см)' }[key] || key;
+                if (nl.includes('двумісна') || nl.includes('двомісна')) return { base: 'L (80х120 см)', xl: 'XL (80х150 см)', xxl: '2XL (90х180 см)' }[key] || key;
                 return { base: 'L (80 см)', xl: 'XL (95 см)' }[key] || key;
             }
             return { base: 'L (85х65 см)', xl: 'XL (105х85 см)', xxl: '2XL (130х90 см)', xxxl: '3XL (140x100 см)', s4xl: '4XL (150x110 см)' }[key] || key;
@@ -133,15 +133,16 @@
                 <div class="option-group"><span class="option-label">Розмір:</span><select id="select-size" onchange="calcTotal()">${sizeOptions}</select></div>
                 ${isSwing ? `<div class="check-item" onclick="toggleCheck('check-swing-mod')"><input type="checkbox" id="check-swing-mod" onchange="calcTotal()"> <span>Розбірна (+475 грн)</span></div>` : ''}
                 <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()"><option value="oxford">Оксфорд</option>${currentP.velurPrice > 0 ? `<option value="velur">Велюр (+${currentP.velurPrice})</option>` : ''}${currentP.ecoPrice > 0 ? `<option value="eco">Екошкіра (+${currentP.ecoPrice})</option>` : ''}</select></div>
-                <div class="option-group"><span class="option-label">Основний колір:</span><select id="select-color" onchange="styleSelect(this)"></select></div>
+                <div class="option-group"><span class="option-label">Основний колір (каркас):</span><select id="select-color" onchange="styleSelect(this)"></select></div>
+                
                 ${isSwing ? `
                     <div class="check-item" onclick="toggleCheck('check-cushion-other')"><input type="checkbox" id="check-cushion-other"> <span>Подушка іншого кольору (+${currentP.diffPrice})</span></div>
                     <div class="check-item" onclick="toggleCheck('check-cushion-combo')"><input type="checkbox" id="check-cushion-combo"> <span>Подушка комбінована (+${currentP.diffPrice})</span></div>
                 ` : `<div class="check-item" onclick="toggleCheck('check-combo')"><input type="checkbox" id="check-combo" ${isCutout ? 'checked' : ''}> <span>Комбінація кольорів (+${currentP.diffPrice})</span></div>`}
                 
                 <div id="extra-colors" style="display:none;">
-                    <div class="option-group"><span class="option-label" id="label-color-2">Другий колір:</span><select id="select-color-2" onchange="styleSelect(this)"></select></div>
-                    <div class="option-group" id="box-color-3" style="display:none;"><span class="option-label">Третій колір:</span><select id="select-color-3" onchange="styleSelect(this)"></select></div>
+                    <div class="option-group"><span class="option-label" id="label-color-2">Додатковий колір:</span><select id="select-color-2" onchange="styleSelect(this)"></select></div>
+                    <div class="option-group" id="box-color-3" style="display:none;"><span class="option-label">Колір подушки (2):</span><select id="select-color-3" onchange="styleSelect(this)"></select></div>
                 </div>
 
                 <div class="option-group"><span class="option-label">Кількість:</span><div class="qty-box"><button class="qty-btn" onclick="adjustQty(-1)">-</button><input type="number" id="qty-input" class="qty-input" value="1" onchange="calcTotal()"><button class="qty-btn" onclick="adjustQty(1)">+</button></div></div>
@@ -159,7 +160,7 @@
                 const other = document.getElementById('check-cushion-other').checked;
                 const combo = document.getElementById('check-cushion-combo').checked;
                 extra.style.display = (other || combo) ? 'block' : 'none';
-                document.getElementById('label-color-2').innerText = combo ? 'Колір подушки 1:' : 'Колір подушки:';
+                document.getElementById('label-color-2').innerText = combo ? 'Колір подушки (1):' : 'Колір подушки:';
                 document.getElementById('box-color-3').style.display = combo ? 'block' : 'none';
             } else {
                 extra.style.display = document.getElementById('check-combo')?.checked ? 'block' : 'none';
@@ -211,9 +212,9 @@
         function addToCart() {
             let name = currentP.name;
             if (document.getElementById('check-swing-mod')?.checked) name += " (РОЗБІРНА)";
-            let colors = document.getElementById('select-color').value;
+            let colors = "Каркас: " + document.getElementById('select-color').value;
             if (document.getElementById('extra-colors').style.display !== 'none') {
-                colors += " + " + document.getElementById('select-color-2').value;
+                colors += " | Подушка: " + document.getElementById('select-color-2').value;
                 if (document.getElementById('box-color-3').style.display !== 'none') colors += " + " + document.getElementById('select-color-3').value;
             }
             cart.push({ name: name, size: document.getElementById('select-size').options[document.getElementById('select-size').selectedIndex].text, fabric: document.getElementById('select-fabric').value, color: colors, qty: parseInt(document.getElementById('qty-input').value), price: calcTotal() });
@@ -233,9 +234,9 @@
         function enableDragScroll() {
             const slider = document.querySelector('.category-menu');
             let isDown = false, startX, scrollLeft;
-            slider.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; });
-            slider.addEventListener('mouseleave', () => isDown = false);
-            slider.addEventListener('mouseup', () => isDown = false);
+            slider.addEventListener('mousedown', (e) => { isDown = true; startX = e.pageX - slider.offsetLeft; scrollLeft = slider.scrollLeft; slider.style.cursor = 'grabbing'; });
+            slider.addEventListener('mouseleave', () => { isDown = false; slider.style.cursor = 'grab'; });
+            slider.addEventListener('mouseup', () => { isDown = false; slider.style.cursor = 'grab'; });
             slider.addEventListener('mousemove', (e) => { if(!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 2; slider.scrollLeft = scrollLeft - walk; });
         }
 

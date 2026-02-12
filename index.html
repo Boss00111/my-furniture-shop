@@ -36,6 +36,12 @@
         .total-price { font-size: 18px; font-weight: 800; color: var(--primary); }
         #cart-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 350px; background: #222; color: white; border-radius: 50px; display: none; justify-content: space-between; align-items: center; padding: 12px 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 999; cursor: pointer; }
         .info-box { background: var(--warning-bg); border: 1px dashed var(--warning-border); padding: 8px; border-radius: 8px; font-size: 11px; margin-bottom: 12px; color: #856404; line-height: 1.3; }
+        
+        /* Стили для элементов корзины */
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .cart-item-info { text-align: left; font-size: 13px; max-width: 70%; }
+        .cart-item-price { font-weight: 700; font-size: 14px; }
+        .remove-btn { color: #ff4d4d; border: none; background: none; font-size: 11px; font-weight: 700; cursor: pointer; padding: 5px 0; }
     </style>
 </head>
 <body>
@@ -230,6 +236,60 @@
                 document.getElementById('cart-total-bar').innerText = cart.reduce((s, i) => s + i.price, 0) + " грн";
             }
         }
+
+        // --- НОВЫЕ ФУНКЦИИ КОРЗИНЫ ---
+        function showCart() {
+            let html = `<h2 style="margin:0 0 15px; font-size:18px;">Ваш кошик</h2>`;
+            if (cart.length === 0) {
+                html += `<p style="color:#999;">Кошик порожній</p>`;
+            } else {
+                cart.forEach((item, idx) => {
+                    html += `
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <b>${item.name}</b><br>
+                                <small>${item.size}, ${item.color} (x${item.qty})</small><br>
+                                <button class="remove-btn" onclick="removeFromCart(${idx})">видалити</button>
+                            </div>
+                            <div class="cart-item-price">${item.price} грн</div>
+                        </div>
+                    `;
+                });
+                const total = cart.reduce((s, i) => s + i.price, 0);
+                html += `
+                    <div style="font-weight:800; font-size:18px; padding:15px 0; display:flex; justify-content:space-between; border-top:2px solid #eee; margin-top:10px;">
+                        <span>Разом:</span><span>${total} грн</span>
+                    </div>
+                    <button class="btn-select" style="width:100%; padding:18px; font-size:16px; background:var(--success);" onclick="submitOrder()">ОФОРМИТИ ЗАМОВЛЕННЯ</button>
+                `;
+            }
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function removeFromCart(idx) {
+            cart.splice(idx, 1);
+            if (cart.length === 0) {
+                document.getElementById('modal').style.display = 'none';
+                updateCartBar();
+            } else {
+                showCart();
+                updateCartBar();
+            }
+        }
+
+        function submitOrder() {
+            const total = cart.reduce((s, i) => s + i.price, 0);
+            const itemsString = cart.map(i => `${i.name} | ${i.size} | ${i.color} | x${i.qty} | ${i.price}грн`).join('\n');
+            const data = {
+                items: itemsString,
+                total: total,
+                date: new Date().toLocaleString()
+            };
+            tg.sendData(JSON.stringify(data));
+            tg.close();
+        }
+        // --- КОНЕЦ НОВЫХ ФУНКЦИЙ ---
 
         function enableDragScroll() {
             const slider = document.querySelector('.category-menu');

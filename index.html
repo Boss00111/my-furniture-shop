@@ -28,7 +28,7 @@
         .option-group { margin-bottom: 12px; text-align: left; }
         .option-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; margin-bottom: 6px; display: block; }
         select { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #eee; font-size: 14px; font-weight: 600; background: #fafafa; }
-        .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid #eee; font-size: 13px; }
+        .check-item { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 12px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; border: 1px solid #eee; font-size: 13px; font-weight: 600; }
         .qty-box { display: flex; align-items: center; background: #f0f0f0; border-radius: 10px; padding: 5px; width: fit-content; }
         .qty-btn { width: 45px; height: 45px; border: none; background: white; border-radius: 8px; font-size: 22px; font-weight: 700; color: var(--primary); }
         .qty-input { width: 50px; border: none; background: transparent; text-align: center; font-size: 18px; font-weight: 800; }
@@ -40,8 +40,7 @@
         .cart-items { flex: 1; overflow-y: auto; padding: 15px; }
         .cart-item { border-bottom: 1px solid #f0f0f0; padding: 15px 0; position: relative; }
         .remove-btn { position: absolute; right: 0; top: 12px; color: #ff4444; border: none; background: #fff1f1; width: 30px; height: 30px; border-radius: 50%; }
-        .btn-order { background: #0088cc; color: white; border: none; width: 100%; padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; }
-        .info-box { background: var(--warning-bg); border: 1px dashed var(--warning-border); padding: 10px; border-radius: 10px; font-size: 12px; margin-bottom: 15px; color: #856404; }
+        .info-box { background: var(--warning-bg); border: 1px dashed var(--warning-border); padding: 10px; border-radius: 10px; font-size: 12px; margin-bottom: 15px; color: #856404; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -66,7 +65,7 @@
         <div class="cart-items" id="cart-items-list"></div>
         <div style="padding: 20px;">
             <div class="total-box"><span>Разом:</span><span id="cart-final-total" class="total-price">0 грн</span></div>
-            <button class="btn-order" onclick="sendAllToTelegram()">Оформити замовлення</button>
+            <button class="btn-select" style="width:100%; padding:15px;" onclick="sendAllToTelegram()">Оформити замовлення</button>
         </div>
     </div>
 
@@ -91,7 +90,6 @@
                 const res = await fetch(CSV_URL + '&cache=' + Date.now());
                 const csv = await res.text();
                 const rows = csv.split('\n').slice(1);
-                
                 products = rows.map(row => {
                     const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/"/g, '').trim());
                     if (c.length < 5) return null;
@@ -103,9 +101,7 @@
                     };
                 }).filter(p => p && p.id);
                 render();
-            } catch (e) {
-                document.getElementById('catalog-container').innerText = "Помилка завантаження. Перевірте з'єднання.";
-            }
+            } catch (e) { console.error(e); }
         }
 
         function render() {
@@ -134,25 +130,18 @@
 
         function getSizeLabel(key, p) {
             const nl = p.name.toLowerCase();
-            const cl = p.cat.toLowerCase();
-            
-            // М'ячі
-            if (nl.includes('мяч') || nl.includes("м'яч")) {
+            if (nl.includes('мяч')) {
                 const ballSizes = { base: 'L (50 см)', xl: 'XL (70 см)', xxl: 'XXL (100 см)', xxxl: '3XL (130 см)' };
                 return ballSizes[key] || key.toUpperCase();
             }
-            
-            // Гойдалки
-            if (cl.includes('гойдалки')) {
-                if (nl.includes('двумісна') || nl.includes('двомісна')) {
+            if (p.cat.toLowerCase().includes('гойдалки')) {
+                if (nl.includes('двомісна')) {
                     const doubleSizes = { base: 'L (80х120 см)', xl: 'XL (80х150 см)', xxl: '2XL (90х180 см)' };
                     return doubleSizes[key] || key.toUpperCase();
-                } else {
-                    const singleSizes = { base: 'L (80 см)', xl: 'XL (95 см)' };
-                    return singleSizes[key] || key.toUpperCase();
                 }
+                const singleSizes = { base: 'L (80 см)', xl: 'XL (95 см)' };
+                return singleSizes[key] || key.toUpperCase();
             }
-
             const defaultSizes = { base: 'L (85х65 см)', xl: 'XL (105х85 см)', xxl: '2XL (130х90 см)', xxxl: '3XL (140x100 см)', s4xl: '4XL (150x110 см)' };
             return defaultSizes[key] || key.toUpperCase();
         }
@@ -170,52 +159,37 @@
 
             modalBody.innerHTML = `
                 <h2 style="margin:0 0 15px; font-size:18px;">${currentP.name}</h2>
-                <div class="info-box">🚚 Відправка протягом <b>4-8 робочих днів</b>.</div>
+                <div class="info-box">🚚 Відправка протягом <b>4-8 робочих днів</b>.<br>
+                ${isSwing ? '⚠️ Не підходить для Укрпошти (габарити). Для укрпошти підходить розбірна.' : ''}</div>
                 
-                ${isSwing ? `<div class="info-box" style="background:#fff3cd; color:#856404;">⚠️ Не підходить для Укрпошти (габарити).</div>` : ''}
-
                 ${isCutout ? `<div class="option-group"><span class="option-label">Форма:</span><select id="select-shape" onchange="calcTotal()"><option value="grusha">Груша</option><option value="oval">Овал (+80 грн)</option></select></div>` : ''}
-                
                 <div class="option-group"><span class="option-label">Розмір:</span><select id="select-size" onchange="calcTotal()">${sizeOptions}</select></div>
                 
-                <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()">
-                    <option value="oxford">Оксфорд</option>
-                    ${currentP.velurPrice > 0 ? `<option value="velur">Велюр (+${currentP.velurPrice} грн)</option>` : ''}
-                    ${currentP.ecoPrice > 0 ? `<option value="eco">Екошкіра (+${currentP.ecoPrice} грн)</option>` : ''}
-                </select></div>
+                ${isSwing ? `<div class="check-item" onclick="toggleCheck('check-swing-mod')"><input type="checkbox" id="check-swing-mod" onchange="calcTotal()"> <span>Гойдалка розбірна (+475 грн)</span></div>` : ''}
 
+                <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()"><option value="oxford">Оксфорд</option>${currentP.velurPrice > 0 ? `<option value="velur">Велюр (+${currentP.velurPrice} грн)</option>` : ''}${currentP.ecoPrice > 0 ? `<option value="eco">Екошкіра (+${currentP.ecoPrice} грн)</option>` : ''}</select></div>
                 <div class="option-group"><span class="option-label">Колір:</span><select id="select-color" onchange="styleSelect(this)"></select></div>
                 
                 <div class="check-item" onclick="toggleCheck('check-combo')">
-                    <input type="checkbox" id="check-combo" ${isCutout ? 'checked' : ''}> <span style="margin-left:8px">Комбінація кольорів</span>
+                    <input type="checkbox" id="check-combo" ${isCutout ? 'checked' : ''}> 
+                    <span id="combo-text">${isSwing ? 'Подушка іншого кольору/комбінована' : 'Комбінація кольорів'}</span>
                 </div>
                 
                 <div id="second-color-box" class="option-group" style="display:${isCutout ? 'block' : 'none'};">
                     <span class="option-label">Другий колір:</span><select id="select-color-2" onchange="styleSelect(this)"></select>
                 </div>
 
-                ${currentP.innerPrice > 0 ? `<div class="check-item" onclick="toggleCheck('check-inner')"><input type="checkbox" id="check-inner"> <span style="margin-left:8px">Внутрішній чохол (+${currentP.innerPrice} грн)</span></div>` : ''}
+                ${currentP.innerPrice > 0 ? `<div class="check-item" onclick="toggleCheck('check-inner')"><input type="checkbox" id="check-inner"> <span>Внутрішній чохол (+${currentP.innerPrice} грн)</span></div>` : ''}
 
-                <div class="option-group" style="margin-top:15px">
+                <div class="option-group">
                     <span class="option-label">Кількість:</span>
-                    <div class="qty-box">
-                        <button class="qty-btn" onclick="adjustQty(-1)">-</button>
-                        <input type="number" id="qty-input" class="qty-input" value="1" readonly>
-                        <button class="qty-btn" onclick="adjustQty(1)">+</button>
-                    </div>
+                    <div class="qty-box"><button class="qty-btn" onclick="adjustQty(-1)">-</button><input type="number" id="qty-input" class="qty-input" value="1" readonly><button class="qty-btn" onclick="adjustQty(1)">+</button></div>
                 </div>
-
                 <div class="total-box"><span>Разом:</span><span class="total-price" id="total-price">0 грн</span></div>
-                <button class="btn-order" onclick="addToCart()">Додати до кошика</button>
+                <button class="btn-select" style="width:100%; padding:15px;" onclick="addToCart()">Додати до кошика</button>
             `;
             updateColors();
             document.getElementById('modal').style.display = 'flex';
-        }
-
-        function adjustQty(v) {
-            const input = document.getElementById('qty-input');
-            input.value = Math.max(1, parseInt(input.value) + v);
-            calcTotal();
         }
 
         function toggleCheck(id) {
@@ -229,59 +203,55 @@
             const fabric = document.getElementById('select-fabric').value;
             const colors = COLOR_DATABASE[fabric] || COLOR_DATABASE.oxford;
             const fill = (el) => { 
-                if(!el) return; 
+                if(!el) return;
                 el.innerHTML = colors.map(c => `<option value="${c.n}" data-color="${c.c}" style="background:${c.c}">${c.n}</option>`).join('');
                 styleSelect(el);
             };
-            fill(document.getElementById('select-color'));
-            fill(document.getElementById('select-color-2'));
+            fill(document.getElementById('select-color')); fill(document.getElementById('select-color-2'));
         }
 
         function styleSelect(el) {
             const opt = el.options[el.selectedIndex];
             if(!opt) return;
             el.style.background = opt.dataset.color;
-            el.style.color = isDark(opt.dataset.color) ? "white" : "black";
+            const rgb = parseInt(opt.dataset.color.substring(1), 16);
+            el.style.color = ((rgb>>16 & 0xff)*0.299 + (rgb>>8 & 0xff)*0.587 + (rgb & 0xff)*0.114) > 150 ? "black" : "white";
             calcTotal();
         }
 
-        function isDark(color) {
-            const rgb = parseInt(color.substring(1), 16);
-            const r = (rgb >> 16) & 0xff, g = (rgb >> 8) & 0xff, b = (rgb >> 0) & 0xff;
-            return (0.2126 * r + 0.7152 * g + 0.0722 * b) < 140;
-        }
+        function adjustQty(v) { document.getElementById('qty-input').value = Math.max(1, parseInt(document.getElementById('qty-input').value) + v); calcTotal(); }
 
         function calcTotal() {
             if(!currentP) return;
             let qty = parseInt(document.getElementById('qty-input').value) || 1;
             const size = document.getElementById('select-size').value;
             let price = currentP[size];
-            
             if (document.getElementById('select-shape')?.value === 'oval') price += 80;
             const fabric = document.getElementById('select-fabric').value;
             if (fabric === 'velur') price += currentP.velurPrice;
             if (fabric === 'eco') price += currentP.ecoPrice;
-            if (document.getElementById('check-combo').checked && !currentP.cat.includes('вирізом')) price += currentP.diffPrice;
+            if (document.getElementById('check-combo').checked) price += currentP.diffPrice;
             if (document.getElementById('check-inner')?.checked) price += currentP.innerPrice;
-            
+            if (document.getElementById('check-swing-mod')?.checked) price += 475;
             const total = price * qty;
             document.getElementById('total-price').innerText = total + " грн";
             return total;
         }
 
         function addToCart() {
-            const item = {
-                name: currentP.name,
+            let name = currentP.name;
+            if (document.getElementById('check-swing-mod')?.checked) name += " (РОЗБІРНА)";
+            if (document.getElementById('select-shape')?.value === 'oval') name += " (ОВАЛ)";
+            cart.push({
+                name: name,
                 size: document.getElementById('select-size').options[document.getElementById('select-size').selectedIndex].text,
                 fabric: document.getElementById('select-fabric').options[document.getElementById('select-fabric').selectedIndex].text,
                 color: document.getElementById('select-color').value,
                 color2: document.getElementById('check-combo').checked ? document.getElementById('select-color-2').value : null,
-                inner: document.getElementById('check-inner')?.checked,
                 qty: parseInt(document.getElementById('qty-input').value),
                 price: calcTotal()
-            };
-            cart.push(item);
-            closeM();
+            });
+            document.getElementById('modal').style.display = 'none';
             updateCartBar();
         }
 
@@ -298,9 +268,9 @@
             const list = document.getElementById('cart-items-list');
             list.innerHTML = cart.map((item, idx) => `
                 <div class="cart-item">
-                    <button class="remove-btn" onclick="removeItem(${idx})">&times;</button>
+                    <button class="remove-btn" style="border:none; background:none; color:red; font-size:20px;" onclick="removeItem(${idx})">&times;</button>
                     <div style="font-weight:700;">${item.name} x${item.qty}</div>
-                    <div style="font-size:12px; color:#666;">${item.size}, ${item.fabric}, ${item.color}${item.color2 ? ' + '+item.color2 : ''}${item.inner ? ', з чохлом' : ''}</div>
+                    <div style="font-size:12px; color:#666;">${item.size}, ${item.fabric}, ${item.color}${item.color2 ? ' + '+item.color2 : ''}</div>
                     <div style="font-weight:700; color:#0088cc;">${item.price} грн</div>
                 </div>`).join('');
             document.getElementById('cart-final-total').innerText = cart.reduce((s, i) => s + i.price, 0) + " грн";
@@ -311,18 +281,16 @@
         function removeItem(idx) { cart.splice(idx, 1); if (cart.length === 0) hideCart(); updateCartBar(); showCart(); }
 
         function sendAllToTelegram() {
-            const itemsString = cart.map(item => `${item.name} x${item.qty} (${item.size}, ${item.fabric}, ${item.color}${item.color2 ? '+'+item.color2 : ''}${item.inner ? '+Чохол' : ''})`).join('; ');
+            const itemsString = cart.map(item => `${item.name} x${item.qty} (${item.size}, ${item.fabric}, ${item.color}${item.color2 ? '+'+item.color2 : ''})`).join('; ');
             tg.sendData(JSON.stringify({ items: itemsString, total: cart.reduce((s, i) => s + i.price, 0) }));
         }
 
         function createModal() {
             if(document.getElementById('modal')) return;
-            const m = document.createElement('div');
-            m.id = 'modal';
-            m.innerHTML = `<div class="modal-content"><div id="modal-body"></div><button onclick="closeM()" style="width:100%; border:none; background:none; padding:15px; color:#999; font-weight:600;">Скасувати</button></div>`;
+            const m = document.createElement('div'); m.id = 'modal';
+            m.innerHTML = `<div class="modal-content"><div id="modal-body"></div><button onclick="document.getElementById('modal').style.display='none'" style="width:100%; border:none; background:none; padding:15px; color:#999;">Скасувати</button></div>`;
             document.body.appendChild(m);
         }
-        function closeM() { document.getElementById('modal').style.display = 'none'; }
         init();
     </script>
 </body>

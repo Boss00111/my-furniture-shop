@@ -162,7 +162,9 @@
         function toggleCheck(id) {
             if (id && event.target.tagName !== 'INPUT') document.getElementById(id).checked = !document.getElementById(id).checked;
             const isSwing = currentP.cat.toLowerCase().includes('гойдалки');
+            const isFuton = currentP.cat.toLowerCase().includes('футон');
             const extra = document.getElementById('extra-colors');
+            
             if (isSwing) {
                 const other = document.getElementById('check-cushion-other').checked;
                 const combo = document.getElementById('check-cushion-combo').checked;
@@ -170,7 +172,13 @@
                 document.getElementById('label-color-2').innerText = combo ? 'Колір подушки (1):' : 'Колір подушки:';
                 document.getElementById('box-color-3').style.display = combo ? 'block' : 'none';
             } else {
-                extra.style.display = document.getElementById('check-combo')?.checked ? 'block' : 'none';
+                const comboChecked = document.getElementById('check-combo')?.checked;
+                extra.style.display = comboChecked ? 'block' : 'none';
+                if (isFuton && comboChecked) {
+                    document.getElementById('label-color-2').innerText = 'Колір верха:';
+                } else if (comboChecked) {
+                    document.getElementById('label-color-2').innerText = 'Додатковий колір:';
+                }
             }
             calcTotal();
         }
@@ -223,7 +231,9 @@
             if (document.getElementById('check-inner')?.checked) name += " + Чохол";
             let colors = "Колір: " + document.getElementById('select-color').value;
             if (document.getElementById('extra-colors').style.display !== 'none') {
-                colors += " | Дод: " + document.getElementById('select-color-2').value;
+                const isFuton = currentP.cat.toLowerCase().includes('футон');
+                const label = isFuton ? "Верх" : "Дод";
+                colors += ` | ${label}: ` + document.getElementById('select-color-2').value;
                 if (document.getElementById('box-color-3').style.display !== 'none') colors += " + " + document.getElementById('select-color-3').value;
             }
             cart.push({ name: name, size: document.getElementById('select-size').options[document.getElementById('select-size').selectedIndex].text, fabric: document.getElementById('select-fabric').value, color: colors, qty: parseInt(document.getElementById('qty-input').value), price: calcTotal() });
@@ -290,12 +300,7 @@
             if(document.getElementById('modal')) return;
             const m = document.createElement('div'); m.id = 'modal';
             m.innerHTML = `<div class="modal-content"><div id="modal-body"></div><button onclick="document.getElementById('modal').style.display='none'" style="width:100%; border:none; background:none; padding:10px; color:#999; font-weight:600;">Скасувати</button></div>`;
-            
-            // Закрытие по клику на фон
-            m.addEventListener('click', (e) => {
-                if (e.target === m) m.style.display = 'none';
-            });
-
+            m.addEventListener('click', (e) => { if (e.target === m) m.style.display = 'none'; });
             document.body.appendChild(m);
         }
         init();

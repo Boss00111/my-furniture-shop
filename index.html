@@ -117,8 +117,9 @@
             const nl = p.name.toLowerCase();
             const cl = p.cat.toLowerCase();
             if (nl.includes('мяч') || nl.includes("м'яч")) return { base: 'L (50 см)', xl: 'XL (70 см)', xxl: 'XXL (100 см)', xxxl: '3XL (130 см)' }[key] || key;
-            if (cl.includes('гойдалки') || cl.includes('футон')) {
-                if (nl.includes('двумісна') || nl.includes('двомісна') || cl.includes('футон')) return { base: 'L (80х120 см)', xl: 'XL (80х150 см)', xxl: '2XL (90х180 см)' }[key] || key;
+            if (cl.includes('футон')) return { base: 'L (160x80)', xl: 'XL (180x100)' }[key] || key;
+            if (cl.includes('гойдалки')) {
+                if (nl.includes('двумісна') || nl.includes('двомісна')) return { base: 'L (80х120 см)', xl: 'XL (80х150 см)', xxl: '2XL (90х180 см)' }[key] || key;
                 return { base: 'L (80 см)', xl: 'XL (95 см)' }[key] || key;
             }
             return { base: 'L (85х65 см)', xl: 'XL (105х85 см)', xxl: '2XL (130х90 см)', xxxl: '3XL (140x100 см)', s4xl: '4XL (150x110 см)' }[key] || key;
@@ -289,6 +290,12 @@
             if(document.getElementById('modal')) return;
             const m = document.createElement('div'); m.id = 'modal';
             m.innerHTML = `<div class="modal-content"><div id="modal-body"></div><button onclick="document.getElementById('modal').style.display='none'" style="width:100%; border:none; background:none; padding:10px; color:#999; font-weight:600;">Скасувати</button></div>`;
+            
+            // Закрытие по клику на фон
+            m.addEventListener('click', (e) => {
+                if (e.target === m) m.style.display = 'none';
+            });
+
             document.body.appendChild(m);
         }
         init();

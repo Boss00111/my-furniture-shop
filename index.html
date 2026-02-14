@@ -77,11 +77,14 @@
                 products = rows.map(row => {
                     const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/"/g, '').trim());
                     if (c.length < 5) return null;
+                    
+                    // Улучшенная функция очистки чисел
                     const num = (v) => {
-                        if (!v) return 0;
-                        let n = parseFloat(v.replace(',', '.'));
+                        if (!v || v.trim() === "" || v.trim() === "0") return 0;
+                        let n = parseFloat(v.replace(/\s/g, '').replace(',', '.'));
                         return isNaN(n) ? 0 : n;
                     };
+
                     return {
                         id: c[0], cat: c[1], name: c[2], img: c[3],
                         base: num(c[4]), xl: num(c[5]), xxl: num(c[6]), xxxl: num(c[7]), s4xl: num(c[8]),

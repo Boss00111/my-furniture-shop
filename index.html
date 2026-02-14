@@ -77,7 +77,11 @@
                 products = rows.map(row => {
                     const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/"/g, '').trim());
                     if (c.length < 5) return null;
-                    const num = (v) => parseFloat(v?.replace(',', '.')) || 0;
+                    const num = (v) => {
+                        if (!v) return 0;
+                        let n = parseFloat(v.replace(',', '.'));
+                        return isNaN(n) ? 0 : n;
+                    };
                     return {
                         id: c[0], cat: c[1], name: c[2], img: c[3],
                         base: num(c[4]), xl: num(c[5]), xxl: num(c[6]), xxxl: num(c[7]), s4xl: num(c[8]),
@@ -165,24 +169,31 @@
         }
 
         function toggleCheck(id) {
-            if (id && event.target.tagName !== 'INPUT') document.getElementById(id).checked = !document.getElementById(id).checked;
+            if (id && event.target.tagName !== 'INPUT') {
+                const el = document.getElementById(id);
+                if (el) el.checked = !el.checked;
+            }
             const isSwing = currentP.cat.toLowerCase().includes('гойдалки');
             const isFuton = currentP.cat.toLowerCase().includes('футон');
             const extra = document.getElementById('extra-colors');
             
             if (isSwing) {
-                const other = document.getElementById('check-cushion-other').checked;
-                const combo = document.getElementById('check-cushion-combo').checked;
+                const other = document.getElementById('check-cushion-other')?.checked;
+                const combo = document.getElementById('check-cushion-combo')?.checked;
                 extra.style.display = (other || combo) ? 'block' : 'none';
-                document.getElementById('label-color-2').innerText = combo ? 'Колір подушки (1):' : 'Колір подушки:';
-                document.getElementById('box-color-3').style.display = combo ? 'block' : 'none';
+                if (document.getElementById('label-color-2')) {
+                    document.getElementById('label-color-2').innerText = combo ? 'Колір подушки (1):' : 'Колір подушки:';
+                }
+                if (document.getElementById('box-color-3')) {
+                    document.getElementById('box-color-3').style.display = combo ? 'block' : 'none';
+                }
             } else {
                 const comboChecked = document.getElementById('check-combo')?.checked;
                 extra.style.display = comboChecked ? 'block' : 'none';
                 if (isFuton && comboChecked) {
-                    document.getElementById('label-color-2').innerText = 'Колір верха:';
+                    if (document.getElementById('label-color-2')) document.getElementById('label-color-2').innerText = 'Колір верха:';
                 } else if (comboChecked) {
-                    document.getElementById('label-color-2').innerText = 'Додатковий колір:';
+                    if (document.getElementById('label-color-2')) document.getElementById('label-color-2').innerText = 'Додатковий колір:';
                 }
             }
             calcTotal();
@@ -222,9 +233,9 @@
             if (fabric === 'eco') price += currentP.ecoPrice;
             if (document.getElementById('check-inner')?.checked) price += currentP.innerPrice;
             if (currentP.cat.toLowerCase().includes('гойдалки')) {
-                if (document.getElementById('check-cushion-other').checked) price += currentP.diffPrice;
-                if (document.getElementById('check-cushion-combo').checked) price += currentP.diffPrice;
-                if (document.getElementById('check-swing-mod').checked) price += 475;
+                if (document.getElementById('check-cushion-other')?.checked) price += currentP.diffPrice;
+                if (document.getElementById('check-cushion-combo')?.checked) price += currentP.diffPrice;
+                if (document.getElementById('check-swing-mod')?.checked) price += 475;
             } else if (document.getElementById('check-combo')?.checked) price += currentP.diffPrice;
             document.getElementById('total-price').innerText = (price * qty) + " грн";
             return price * qty;

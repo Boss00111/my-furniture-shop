@@ -140,7 +140,12 @@
                 <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()"><option value="oxford">Оксфорд</option>${currentP.velurPrice > 0 ? `<option value="velur">Велюр (+${currentP.velurPrice})</option>` : ''}${currentP.ecoPrice > 0 ? `<option value="eco">Екошкіра (+${currentP.ecoPrice})</option>` : ''}</select></div>
                 <div class="option-group"><span class="option-label">Основний колір:</span><select id="select-color" onchange="styleSelect(this)"></select></div>
                 
-                ${currentP.innerPrice > 0 ? `<div class="check-item" onclick="toggleCheck('check-inner')"><input type="checkbox" id="check-inner" onchange="calcTotal()"> <span>Внутрішній чохол (+${currentP.innerPrice} грн)</span></div>` : ''}
+                ${currentP.innerPrice > 0 ? `
+                    <div class="check-item" onclick="toggleCheck('check-inner')">
+                        <input type="checkbox" id="check-inner" onchange="calcTotal()"> 
+                        <span>Внутрішній чохол (+${currentP.innerPrice} грн)</span>
+                    </div>
+                ` : ''}
 
                 ${isSwing ? `
                     <div class="check-item" onclick="toggleCheck('check-cushion-other')"><input type="checkbox" id="check-cushion-other"> <span>Подушка іншого кольору (+${currentP.diffPrice})</span></div>

@@ -14,7 +14,7 @@
         .menu-wrapper { position: relative; background: white; border-top: 1px solid #eee; overflow: hidden; }
         .category-menu { display: flex; overflow-x: auto; gap: 8px; padding: 10px 15px; scrollbar-width: none; cursor: grab; user-select: none; }
         .category-menu::-webkit-scrollbar { display: none; }
-        .category-menu button { white-space: nowrap; padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 12px; font-weight: 600; flex-shrink: 0; pointer-events: auto; }
+        .category-menu button { white-space: nowrap; padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; background: #fff; font-size: 12px; font-weight: 600; flex-shrink: 0; }
         #catalog-container { padding: 15px; max-width: 1000px; margin: 0 auto; padding-bottom: 120px; }
         .category-title { text-align: center; margin: 30px 0 15px; font-size: 15px; font-weight: 800; text-transform: uppercase; color: #777; }
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -52,7 +52,10 @@
     <div id="catalog-container">Завантаження...</div>
 
     <div id="cart-bar" onclick="showCart()">
-        <div style="display:flex; align-items:center;"><span>Кошик</span><span id="cart-count" style="margin-left:8px; background:var(--primary); padding:2px 8px; border-radius:10px; font-size:12px;">0</span></div>
+        <div style="display:flex; align-items:center;">
+            <span>Кошик</span>
+            <span id="cart-count" style="margin-left:8px; background:var(--primary); padding:2px 8px; border-radius:10px; font-size:12px;">0</span>
+        </div>
         <span id="cart-total-bar" style="font-weight:700;">0 грн</span>
     </div>
 
@@ -78,7 +81,7 @@
                     const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/"/g, '').trim());
                     if (c.length < 5) return null;
                     const num = (v) => {
-                        if (!v || v.trim() === "" || v.trim() === "0" || v.trim() === "0,01") return 0;
+                        if (!v || v.trim() === "" || v.trim() === "0" || v.trim() === "0,01" || v.trim() === "0.01") return 0;
                         let n = parseFloat(v.replace(/\s/g, '').replace(',', '.'));
                         return isNaN(n) ? 0 : n;
                     };
@@ -241,7 +244,14 @@
                 colors += ` | Дод: ` + document.getElementById('select-color-2').value;
                 if (document.getElementById('box-color-3') && document.getElementById('box-color-3').style.display !== 'none') colors += " + " + document.getElementById('select-color-3').value;
             }
-            cart.push({ name: name, size: document.getElementById('select-size').options[document.getElementById('select-size').selectedIndex].text, fabric: document.getElementById('select-fabric').value, color: colors, qty: parseInt(document.getElementById('qty-input').value), price: calcTotal() });
+            cart.push({ 
+                name: name, 
+                size: document.getElementById('select-size').options[document.getElementById('select-size').selectedIndex].text, 
+                fabric: document.getElementById('select-fabric').value, 
+                color: colors, 
+                qty: parseInt(document.getElementById('qty-input').value), 
+                price: calcTotal() 
+            });
             document.getElementById('modal').style.display = 'none';
             updateCartBar();
         }
@@ -250,7 +260,8 @@
             const bar = document.getElementById('cart-bar');
             bar.style.display = cart.length > 0 ? 'flex' : 'none';
             if (cart.length > 0) {
-                document.getElementById('cart-count').innerText = cart.length;
+                // Считаем общее количество всех единиц товаров
+                document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0);
                 document.getElementById('cart-total-bar').innerText = cart.reduce((s, i) => s + i.price, 0) + " грн";
             }
         }
@@ -287,8 +298,16 @@
         }
 
         function submitOrder() {
+            const totalSum = cart.reduce((s, i) => s + i.price, 0);
+            const totalQty = cart.reduce((s, i) => s + i.qty, 0);
             const itemsString = cart.map(i => `${i.name} | ${i.size} | ${i.color} | x${i.qty} | ${i.price}грн`).join('\n');
-            tg.sendData(JSON.stringify({ items: itemsString, total: cart.reduce((s, i) => s + i.price, 0) }));
+            
+            // Передаем объект с четкими именами полей
+            tg.sendData(JSON.stringify({ 
+                items: itemsString, 
+                total: totalSum,
+                count: totalQty
+            }));
             tg.close();
         }
 

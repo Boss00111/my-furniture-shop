@@ -77,14 +77,11 @@
                 products = rows.map(row => {
                     const c = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/"/g, '').trim());
                     if (c.length < 5) return null;
-                    
-                    // Улучшенная функция очистки чисел
                     const num = (v) => {
-                        if (!v || v.trim() === "" || v.trim() === "0") return 0;
+                        if (!v || v.trim() === "" || v.trim() === "0" || v.trim() === "0,01") return 0;
                         let n = parseFloat(v.replace(/\s/g, '').replace(',', '.'));
                         return isNaN(n) ? 0 : n;
                     };
-
                     return {
                         id: c[0], cat: c[1], name: c[2], img: c[3],
                         base: num(c[4]), xl: num(c[5]), xxl: num(c[6]), xxxl: num(c[7]), s4xl: num(c[8]),
@@ -155,9 +152,11 @@
                 ` : ''}
 
                 ${isSwing ? `
-                    <div class="check-item" onclick="toggleCheck('check-cushion-other')"><input type="checkbox" id="check-cushion-other"> <span>Подушка іншого кольору (+${currentP.diffPrice})</span></div>
-                    <div class="check-item" onclick="toggleCheck('check-cushion-combo')"><input type="checkbox" id="check-cushion-combo"> <span>Подушка комбінована (+${currentP.diffPrice})</span></div>
-                ` : `<div class="check-item" onclick="toggleCheck('check-combo')"><input type="checkbox" id="check-combo" ${isCutout ? 'checked' : ''}> <span>Комбінація кольорів (+${currentP.diffPrice})</span></div>`}
+                    ${currentP.diffPrice > 0 ? `<div class="check-item" onclick="toggleCheck('check-cushion-other')"><input type="checkbox" id="check-cushion-other"> <span>Подушка іншого кольору (+${currentP.diffPrice})</span></div>` : ''}
+                    ${currentP.diffPrice > 0 ? `<div class="check-item" onclick="toggleCheck('check-cushion-combo')"><input type="checkbox" id="check-cushion-combo"> <span>Подушка комбінована (+${currentP.diffPrice})</span></div>` : ''}
+                ` : `
+                    ${currentP.diffPrice > 0 ? `<div class="check-item" onclick="toggleCheck('check-combo')"><input type="checkbox" id="check-combo" ${isCutout ? 'checked' : ''}> <span>Комбінація кольорів (+${currentP.diffPrice})</span></div>` : ''}
+                `}
                 
                 <div id="extra-colors" style="display:none;">
                     <div class="option-group"><span class="option-label" id="label-color-2">Додатковий колір:</span><select id="select-color-2" onchange="styleSelect(this)"></select></div>
@@ -177,27 +176,16 @@
                 if (el) el.checked = !el.checked;
             }
             const isSwing = currentP.cat.toLowerCase().includes('гойдалки');
-            const isFuton = currentP.cat.toLowerCase().includes('футон');
             const extra = document.getElementById('extra-colors');
-            
+            if(!extra) return;
+
             if (isSwing) {
                 const other = document.getElementById('check-cushion-other')?.checked;
                 const combo = document.getElementById('check-cushion-combo')?.checked;
                 extra.style.display = (other || combo) ? 'block' : 'none';
-                if (document.getElementById('label-color-2')) {
-                    document.getElementById('label-color-2').innerText = combo ? 'Колір подушки (1):' : 'Колір подушки:';
-                }
-                if (document.getElementById('box-color-3')) {
-                    document.getElementById('box-color-3').style.display = combo ? 'block' : 'none';
-                }
             } else {
                 const comboChecked = document.getElementById('check-combo')?.checked;
                 extra.style.display = comboChecked ? 'block' : 'none';
-                if (isFuton && comboChecked) {
-                    if (document.getElementById('label-color-2')) document.getElementById('label-color-2').innerText = 'Колір верха:';
-                } else if (comboChecked) {
-                    if (document.getElementById('label-color-2')) document.getElementById('label-color-2').innerText = 'Додатковий колір:';
-                }
             }
             calcTotal();
         }
@@ -249,11 +237,9 @@
             if (document.getElementById('check-swing-mod')?.checked) name += " (РОЗБІРНА)";
             if (document.getElementById('check-inner')?.checked) name += " + Чохол";
             let colors = "Колір: " + document.getElementById('select-color').value;
-            if (document.getElementById('extra-colors').style.display !== 'none') {
-                const isFuton = currentP.cat.toLowerCase().includes('футон');
-                const label = isFuton ? "Верх" : "Дод";
-                colors += ` | ${label}: ` + document.getElementById('select-color-2').value;
-                if (document.getElementById('box-color-3').style.display !== 'none') colors += " + " + document.getElementById('select-color-3').value;
+            if (document.getElementById('extra-colors') && document.getElementById('extra-colors').style.display !== 'none') {
+                colors += ` | Дод: ` + document.getElementById('select-color-2').value;
+                if (document.getElementById('box-color-3') && document.getElementById('box-color-3').style.display !== 'none') colors += " + " + document.getElementById('select-color-3').value;
             }
             cart.push({ name: name, size: document.getElementById('select-size').options[document.getElementById('select-size').selectedIndex].text, fabric: document.getElementById('select-fabric').value, color: colors, qty: parseInt(document.getElementById('qty-input').value), price: calcTotal() });
             document.getElementById('modal').style.display = 'none';

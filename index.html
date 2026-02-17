@@ -65,7 +65,18 @@
 
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/1Kd4ODQgS8QOFHOg2k4lCvRgizqSRnY17qiaStmV6BNY/export?format=csv&gid=415679695';
         const COLOR_DATABASE = {
-            oxford: [{ n: "2 - коричневий", c: "#4B2D0E" }, { n: "3 - какао", c: "#A38A75" }, { n: "4 - бежевий", c: "#F5F5DC" }, { n: "5 - електрик", c: "#0000FF" }, { n: "6 - трава", c: "#008000" }, { n: "7 - малина", c: "#E30B5D" }, { n: "8 - темно-синій", c: "#000080" }, { n: "12 - червоний", c: "#FF0000" }, { n: "15 - сірий", c: "#808080" }, { n: "17 - темно-сірий", c: "#4F4F4F" }, { n: "30 - чорний", c: "#000000" }],
+            oxford: [
+                { n: "2 - коричневий", c: "#4B2D0E" }, { n: "3 - какао", c: "#A38A75" }, { n: "4 - бежевий", c: "#F5F5DC" }, 
+                { n: "4/1 - пісочно-сірий", c: "#C2B280" }, { n: "4/2 - пудровий", c: "#FFD1DC" }, { n: "5 - електрик", c: "#0000FF" }, 
+                { n: "6 - трава", c: "#008000" }, { n: "7 - малина", c: "#E30B5D" }, { n: "8 - темно-синій", c: "#000080" }, 
+                { n: "9 - блакитний", c: "#00BFFF" }, { n: "10 - фіолетовий", c: "#800080" }, { n: "11 - м'ята", c: "#3EB489" }, 
+                { n: "12 - червоний", c: "#FF0000" }, { n: "13 - гірчичний", c: "#E1AD01" }, { n: "14 - жовтий", c: "#FFFF00" }, 
+                { n: "14/1 - жовтогарячий", c: "#FF8C00" }, { n: "15 - сірий", c: "#808080" }, { n: "17 - темно- сірий", c: "#4F4F4F" }, 
+                { n: "18 - вино", c: "#722F37" }, { n: "19 - блакитний світлий", c: "#ADD8E6" }, { n: "20 - білий", c: "#FFFFFF" }, 
+                { n: "21 - рожевий пиловий", c: "#DCAE96" }, { n: "22 - оранжевий", c: "#FFA500" }, { n: "26 - салат", c: "#87FF2A" }, 
+                { n: "27 - бузок", c: "#C8A2C8" }, { n: "28 - темно-зелений", c: "#013220" }, { n: "29 - хакі", c: "#4B5320" }, 
+                { n: "30 - чорний", c: "#000000" }, { n: "32 - рожевий (Барбі)", c: "#FF69B4" }
+            ],
             velur: [{ n: "Багіра 20 (Ash)", c: "#3c3f4a" }, { n: "Жасмін 91 (Grey)", c: "#9c9ba0" }, { n: "Жасмін 100 (Black)", c: "#1d1d1b" }],
             eco: [{ n: "ЕК3 Чорний", c: "#1a1a1a" }, { n: "ЕК19 Білий", c: "#ffffff" }]
         };
@@ -260,7 +271,6 @@
             const bar = document.getElementById('cart-bar');
             bar.style.display = cart.length > 0 ? 'flex' : 'none';
             if (cart.length > 0) {
-                // Считаем общее количество всех единиц товаров
                 document.getElementById('cart-count').innerText = cart.reduce((s, i) => s + i.qty, 0);
                 document.getElementById('cart-total-bar').innerText = cart.reduce((s, i) => s + i.price, 0) + " грн";
             }
@@ -302,7 +312,6 @@
             const totalQty = cart.reduce((s, i) => s + i.qty, 0);
             const itemsString = cart.map(i => `${i.name} | ${i.size} | ${i.color} | x${i.qty} | ${i.price}грн`).join('\n');
             
-            // Передаем объект с четкими именами полей
             tg.sendData(JSON.stringify({ 
                 items: itemsString, 
                 total: totalSum,

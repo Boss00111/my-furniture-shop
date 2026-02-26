@@ -99,7 +99,7 @@
                     return {
                         id: c[0], cat: c[1], name: c[2], img: c[3],
                         base: num(c[4]), xl: num(c[5]), xxl: num(c[6]), xxxl: num(c[7]), s4xl: num(c[8]),
-                        velurPrice: num(c[9]), innerPrice: num(c[10]), ecoPrice: num(c[11]), diffPrice: num(c[12])
+                        velurPrice: num(c[9]), innerPrice: num(c[10]), ecoPrice: num(c[11]), diffPrice: num(c[12]), oxfordDisable: num(c[13])
                     };
                 }).filter(p => p && p.id);
                 render();
@@ -149,13 +149,18 @@
             let sizeOptions = "";
             ['base', 'xl', 'xxl', 'xxxl', 's4xl'].forEach(k => { if (currentP[k] > 0) sizeOptions += `<option value="${k}" ${k === 'xl' ? 'selected' : ''}>${getSizeLabel(k, currentP)}</option>`; });
 
+            let fabricOptions = "";
+            if (currentP.oxfordDisable !== 1) fabricOptions += `<option value="oxford">Оксфорд</option>`;
+            if (currentP.velurPrice > 0) fabricOptions += `<option value="velur">Велюр (+${currentP.velurPrice})</option>`;
+            if (currentP.ecoPrice > 0) fabricOptions += `<option value="eco">Екошкіра (+${currentP.ecoPrice})</option>`;
+
             document.getElementById('modal-body').innerHTML = `
                 <h3 style="margin:0 0 10px; font-size:16px;">${currentP.name}</h3>
                 <div class="info-box">🚚 4-8 роб. днів. ${isSwing ? '<br>⚠️ <b>Для Укрпошти тільки розбірна!</b>' : ''}</div>
                 ${isCutout ? `<div class="option-group"><span class="option-label">Форма:</span><select id="select-shape" onchange="calcTotal()"><option value="grusha">Груша</option><option value="oval">Овал (+80 грн)</option></select></div>` : ''}
                 <div class="option-group"><span class="option-label">Розмір:</span><select id="select-size" onchange="calcTotal()">${sizeOptions}</select></div>
                 ${isSwing ? `<div class="check-item" onclick="toggleCheck('check-swing-mod')"><input type="checkbox" id="check-swing-mod" onchange="calcTotal()"> <span>Розбірна (+475 грн)</span></div>` : ''}
-                <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()"><option value="oxford">Оксфорд</option>${currentP.velurPrice > 0 ? `<option value="velur">Велюр (+${currentP.velurPrice})</option>` : ''}${currentP.ecoPrice > 0 ? `<option value="eco">Екошкіра (+${currentP.ecoPrice})</option>` : ''}</select></div>
+                <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()">${fabricOptions}</select></div>
                 <div class="option-group"><span class="option-label">Основний колір:</span><select id="select-color" onchange="styleSelect(this)"></select></div>
                 
                 ${currentP.innerPrice > 0 ? `

@@ -149,19 +149,14 @@
             let sizeOptions = "";
             ['base', 'xl', 'xxl', 'xxxl', 's4xl'].forEach(k => { if (currentP[k] > 0) sizeOptions += `<option value="${k}" ${k === 'xl' ? 'selected' : ''}>${getSizeLabel(k, currentP)}</option>`; });
 
-            let fabricOptions = "";
-            if (currentP.oxfordDisable !== 1) fabricOptions += `<option value="oxford">Оксфорд</option>`;
-            if (currentP.velurPrice > 0) fabricOptions += `<option value="velur">Велюр (+${currentP.velurPrice})</option>`;
-            if (currentP.ecoPrice > 0) fabricOptions += `<option value="eco">Екошкіра (+${currentP.ecoPrice})</option>`;
-
             document.getElementById('modal-body').innerHTML = `
                 <h3 style="margin:0 0 10px; font-size:16px;">${currentP.name}</h3>
                 <div class="info-box">🚚 4-8 роб. днів. ${isSwing ? '<br>⚠️ <b>Для Укрпошти тільки розбірна!</b>' : ''}</div>
                 ${isCutout ? `<div class="option-group"><span class="option-label">Форма:</span><select id="select-shape" onchange="calcTotal()"><option value="grusha">Груша</option><option value="oval">Овал (+80 грн)</option></select></div>` : ''}
                 <div class="option-group"><span class="option-label">Розмір:</span><select id="select-size" onchange="calcTotal()">${sizeOptions}</select></div>
                 ${isSwing ? `<div class="check-item" onclick="toggleCheck('check-swing-mod')"><input type="checkbox" id="check-swing-mod" onchange="calcTotal()"> <span>Розбірна (+475 грн)</span></div>` : ''}
-                <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()">${fabricOptions}</select></div>
-                <div class="option-group"><span class="option-label">Основний колір:</span><select id="select-color" onchange="styleSelect(this)"></select></div>
+                <div class="option-group"><span class="option-label">Тканина:</span><select id="select-fabric" onchange="updateColors()"><option value="oxford">Оксфорд</option>${currentP.velurPrice > 0 ? `<option value="velur">Велюр (+${currentP.velurPrice})</option>` : ''}${currentP.ecoPrice > 0 ? `<option value="eco">Екошкіра (+${currentP.ecoPrice})</option>` : ''}</select></div>
+                <div class="option-group" id="group-color-1"><span class="option-label">Основний колір:</span><select id="select-color" onchange="styleSelect(this)"></select></div>
                 
                 ${currentP.innerPrice > 0 ? `
                     <div class="check-item" onclick="toggleCheck('check-inner')">
@@ -217,6 +212,14 @@
                 el.innerHTML = colors.map(c => `<option value="${c.n}" data-color="${c.c}" style="background:${c.c}">${c.n}</option>`).join('');
                 styleSelect(el);
             });
+            
+            // Logic to hide color selection
+            const colorGroup = document.getElementById('group-color-1');
+            if (fabric === 'oxford' && currentP.oxfordDisable === 1) {
+                colorGroup.style.display = 'none';
+            } else {
+                colorGroup.style.display = 'block';
+            }
         }
 
         function styleSelect(el) {
@@ -255,11 +258,19 @@
             let name = currentP.name;
             if (document.getElementById('check-swing-mod')?.checked) name += " (РОЗБІРНА)";
             if (document.getElementById('check-inner')?.checked) name += " + Чохол";
-            let colors = "Колір: " + document.getElementById('select-color').value;
-            if (document.getElementById('extra-colors') && document.getElementById('extra-colors').style.display !== 'none') {
-                colors += ` | Дод: ` + document.getElementById('select-color-2').value;
-                if (document.getElementById('box-color-3') && document.getElementById('box-color-3').style.display !== 'none') colors += " + " + document.getElementById('select-color-3').value;
+            
+            // Если скрыто, пишем "Без вибору" или оставляем как есть
+            let colors = "";
+            if (document.getElementById('group-color-1').style.display !== 'none') {
+                colors = "Колір: " + document.getElementById('select-color').value;
+                if (document.getElementById('extra-colors') && document.getElementById('extra-colors').style.display !== 'none') {
+                    colors += ` | Дод: ` + document.getElementById('select-color-2').value;
+                    if (document.getElementById('box-color-3') && document.getElementById('box-color-3').style.display !== 'none') colors += " + " + document.getElementById('select-color-3').value;
+                }
+            } else {
+                colors = "Колір: не вибрано (стандарт)";
             }
+
             cart.push({ 
                 name: name, 
                 size: document.getElementById('select-size').options[document.getElementById('select-size').selectedIndex].text, 
